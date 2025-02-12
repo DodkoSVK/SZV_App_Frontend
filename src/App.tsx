@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'; // Uistite sa, že používate
 
 // Components
 import TheNavigation from './components/TheNavigation';
-import TheClubs from './components/views/clubs';
+import TheClubs from './components/views/Clubs';
 
 function App() {
   return (

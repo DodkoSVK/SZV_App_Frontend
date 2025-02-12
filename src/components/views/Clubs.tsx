@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 //Types
-
+import { Club } from '../../assets/types/index';
 //Components
-import SuccessAlert from '../components/alerts/SuccessAlert';
-import FailedAlert from '../components/alerts/FailedAlert';
+//import SuccessAlert from '../components/alerts/SuccessAlert';
+//import FailedAlert from '../components/alerts/FailedAlert';
 //Childrens Components
-
+import ClubsTable from '../clubs/ClubsTable';
 
 // Component
 const TheClubs: React.FC = () => {
     //useStates
-    const [clubs, setClubs] = useState<Clubs[] | { message: string}>({ message: "Načítavam kluby..."});
+    const [clubs, setClubs] = useState<Club[] | { message: string }>({ message: "Načítavam kluby..." });
 
     //Getting clubs from DB
     const getClubs = async () => {
@@ -24,9 +24,15 @@ const TheClubs: React.FC = () => {
             }
         })
     };
+
+    useEffect(() => {
+        getClubs();
+    }, []);
+
     return(
         <article>
-            
+            <div><h1>Tieto kluby mame</h1></div>
+            <ClubsTable clubs={clubs} />
         </article>
     );
 };

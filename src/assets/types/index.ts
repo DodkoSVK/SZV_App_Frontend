@@ -1,12 +1,12 @@
-export interface Clubs {
+export interface Club {
     id: number
     name: string
-    type: string
-    type_full: string
     city: string
+    street: string
     postal: string
     ico: string
     mail: string
     tel: string
-    chairman: string
+    f_name: string
+    surname: string
 }

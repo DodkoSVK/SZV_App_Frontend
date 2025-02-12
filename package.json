@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "start:frontend": "vite",
-    "start:backend": "cd ../SZV_App_Backend && yarn start",
+    "start:backend": "cd ../SZV_App_Backend && yarn dev",
     "both": "concurrently \"yarn start:frontend\" \"yarn start:backend\""
   },
   "dependencies": {
