@@ -10,3 +10,12 @@ export interface Club {
     f_name: string
     surname: string
 }
+export interface CreateClub {
+    name: string
+    city: string
+    street: string
+    postal: string
+    ico: string
+    mail: string
+    tel: string
+}

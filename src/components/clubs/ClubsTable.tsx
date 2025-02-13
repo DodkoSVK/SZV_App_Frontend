@@ -29,9 +29,9 @@ const ClubsTable: React.FC<Props> = (props) => {
         props.createClub();
     }
     return (
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mx-10 mt-10 rounded-sm border border-white-900 border-solid">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mx-10 rounded-sm border border-gray-500 border-solid">
+            <table className="w-full text-sm text-left rtl:text-right text-[#F7F9FB]">
+                <thead className="text-xs uppercase bg-[#0B3C5D]">
                     <tr>
                         <th scope="col" className="px-6 py-3">
                             <div className="flex items-center">
@@ -79,10 +79,10 @@ const ClubsTable: React.FC<Props> = (props) => {
                             </div>
                         </th>
                         <th scope="col" className="px-6 py-3">
-                            <div className="flex items-center uppercase text-xs text-gray-700">
-                                <button onClick={() => handleAddClub()} className="flex items-center space-x-2">
-                                    <img src={plusIcon} alt="Add" className="w-4 h-4" />
+                            <div className="flex items-center">
+                                <button onClick={() => handleAddClub()} className="flex items-center space-x-2 uppercase">
                                     <span>Pridať klub</span>
+                                    <img src={plusIcon} alt="Add" className="w-6 h-6" />
                                 </button>
                             </div>
                         </th>

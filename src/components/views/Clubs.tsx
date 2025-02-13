@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 //Types
-import { Club } from '../../assets/types/index';
+import { Club, CreateClub } from '../../assets/types/index';
 //Components
 //import SuccessAlert from '../components/alerts/SuccessAlert';
 //import FailedAlert from '../components/alerts/FailedAlert';
@@ -13,6 +13,7 @@ import ClubCreateForm from '../clubs/ClubCreateForm';
 const TheClubs: React.FC = () => {
     //useStates
     const [clubs, setClubs] = useState<Club[] | { message: string }>({ message: "Načítavam kluby..." });
+    const [createClubUI, setCreateClubUI] = useState<boolean>(false);
 
     //Getting clubs from DB
     const getClubs = async () => {
@@ -36,11 +37,13 @@ const TheClubs: React.FC = () => {
             console.log(response.data);
         })
     };
+    const createClub = async (club : CreateClub) => {
+        console.log("Vytváram klub s týmito údajmi: ", club);
+    };
 
-
-    const handleCreateClub = () => {
+    const openCreateClubUI = () => {
         console.log("Vytvaram klub");
-        //Tu otvor UI na vytvorenie klubu
+        setCreateClubUI(true); //Tu otvor UI na vytvorenie klubu
     };
 
     useEffect(() => {   
@@ -49,14 +52,21 @@ const TheClubs: React.FC = () => {
 
     return(
         <article>
-            <div><h1>Tieto kluby mame</h1></div>
+            <div className="m-8 text-3xl font-bold text-center text-[#F7F9FB] uppercase">
+                <h1>Športové kluby SZV</h1>
+            </div>
             <ClubsTable 
                 clubs={clubs} 
                 sortBy={(key: string) => getSortedClubs(key)}
                 editClub={(id: number) => getClubByID(id)}
-                createClub={() => handleCreateClub()}
+                createClub={() => openCreateClubUI()}
             />
-            <ClubCreateForm />
+            { createClubUI === true && createClubUI && (
+                <ClubCreateForm 
+                    closeCreateClubUI={() => setCreateClubUI(false)}
+                    handleCreateClub={(club: CreateClub) => createClub(club)}                    
+                />
+            )}
         </article>
     );
 };
