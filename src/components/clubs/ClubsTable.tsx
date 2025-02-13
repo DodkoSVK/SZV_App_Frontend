@@ -7,6 +7,7 @@ interface Props {
     clubs: Club[] | { message: string };
     sortBy: (key: string) => void;
     editClub: (id: number) => void;
+    createClub: () => void;
 }
 
 const ClubsTable: React.FC<Props> = (props) => {
@@ -25,6 +26,7 @@ const ClubsTable: React.FC<Props> = (props) => {
     }
     const handleAddClub = () => {
         console.log('Pridávam nový klub');
+        props.createClub();
     }
     return (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg mx-10 mt-10 rounded-sm border border-white-900 border-solid">
