@@ -19,3 +19,7 @@ export interface CreateClub {
     mail: string
     tel: string
 }
+export interface openEditCreateUI {
+    id: number,
+    message: string
+}

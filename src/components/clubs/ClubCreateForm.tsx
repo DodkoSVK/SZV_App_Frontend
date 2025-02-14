@@ -4,6 +4,7 @@ import { CreateClub } from "../../assets/types";
 interface Props {
     closeCreateClubUI: () => void
     handleCreateClub: (club : CreateClub) => void
+    formTitle: string
 };
 
 const ClubCreateForm: React.FC<Props> = (props) => {
@@ -33,15 +34,15 @@ const ClubCreateForm: React.FC<Props> = (props) => {
 
     return (   
         <section>
-            <div className="flex flex-col items-center justify-center mx-auto md:h-screen lg:py-0">               
-                <div className="w-full bg-[] rounded-lg shadow border border-gray-500 md:mt-0 sm:max-w-md xl:p-0">
+            <div className="fixed inset-0 z-49 flex items-center justify-center backdrop-filter backdrop-blur-xs">               
+                <div className="w-full bg-[#0B3C5D] rounded-lg shadow border border-gray-500 md:mt-0 sm:max-w-md xl:p-0">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-[#F7F9FB] md:text-2xl">
-                            Vytvoriť nový klub
+                            {props.formTitle}
                         </h1>
                         <form className="space-y-4 md:space-y-6" onSubmit={handleCreateClubForm}>
                             <div className="relative z-0 w-full mb-5 group">
-                                <input                                     
+                                <input                         
                                     type="text"
                                     name="floating_name"
                                     id="floating_name"
@@ -119,7 +120,6 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                                         id="floating_tel"
                                         className="block py-2.5 px-0 w-full text-sm text-[#F7F9FB] bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#D9B310] peer"
                                         placeholder=" "
-                                        required
                                     />
                                     <label
                                         htmlFor="floating_tel"
