@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 //Types
-import { Club, CreateClub, openEditCreateUI } from '../../assets/types/index';
+import { Club, defaultClub, CreateClub, openEditCreateUI } from '../../assets/types/index';
 //Components
 import SuccessAlert from '../../components/alerts/SuccessAlert';
 import FailedAlert from '../../components/alerts/FailedAlert';
@@ -13,6 +13,7 @@ import ClubCreateForm from '../clubs/ClubCreateForm';
 const TheClubs: React.FC = () => {
     //useStates
     const [clubs, setClubs] = useState<Club[] | { message: string }>({ message: "Načítavam kluby..." });
+    const [club, setClub] = useState<Club>(defaultClub);
     const [ClubUI, setClubUI] = useState<openEditCreateUI>();
     const [renderClubUI, setRenderClubUI] = useState<boolean | null>(null);
     const [alert, setAlert] = useState<boolean | null>(null);
@@ -32,6 +33,7 @@ const TheClubs: React.FC = () => {
     const getClubByID = async (id: number) => {
         axios.get(`http://localhost:3002/api/club/${id}`).then(response => {
             console.log(response.data);
+            setClub(response.data);
         })
     };
     const getSortedClubs = async (key: string) => {
@@ -69,11 +71,15 @@ const TheClubs: React.FC = () => {
 
     const handleOpenCreateEditUI = (uiData: openEditCreateUI) => {        
         setClubUI(uiData);
-        if(ClubUI?.id === 0)       
+        if(uiData.id === 0){
+            setClub(Object.assign({}, defaultClub));
             setRenderClubUI(true); 
-        if(ClubUI.id > 1)
-            setRenderClubUI(false); 
-
+        }                
+        if(uiData?.id > 1) {
+            getClubByID(uiData.id);
+            setRenderClubUI(true); 
+        }
+            
     };
     
     const handleCloseAlert = () => {
@@ -97,6 +103,7 @@ const TheClubs: React.FC = () => {
                 <ClubCreateForm 
                     closeCreateClubUI={() => setRenderClubUI(false)}
                     handleCreateClub={(club: CreateClub) => createClub(club)} 
+                    clubData={club}
                     formTitle={ClubUI?.message || ""}                
                 />
             )}

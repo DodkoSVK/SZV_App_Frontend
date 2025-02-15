@@ -10,6 +10,18 @@ export interface Club {
     f_name: string
     surname: string
 }
+export const defaultClub: Club = {
+    id: 0,
+    name: "",
+    city: "",
+    street: "",
+    postal: "",
+    ico: "",
+    mail: "",
+    tel: "",
+    f_name: "",
+    surname: ""
+};
 export interface CreateClub {
     name: string
     city: string
@@ -22,4 +34,9 @@ export interface CreateClub {
 export interface openEditCreateUI {
     id: number,
     message: string
+}
+
+export interface Button {
+    buttonName: string
+    buttonText: string
 }
