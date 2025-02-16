@@ -4,7 +4,7 @@ interface Props {
     buttonType: "submit" | "reset" | "button";
     buttonText: string
     buttonName: string
-    clickAction: (e: MouseEvent<HTMLButtonElement>) => void;
+    clickAction?: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 const RedButton: React.FC<Props> = (props) => {
     return (

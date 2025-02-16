@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 //Types
-import { Club, defaultClub, CreateClub, openEditCreateUI } from '../../assets/types/index';
+import { Club, defaultClub, CreateClub, openEditCreateUI, Alert, EditClub } from '../../assets/types/index';
 //Components
 import SuccessAlert from '../../components/alerts/SuccessAlert';
 import FailedAlert from '../../components/alerts/FailedAlert';
@@ -15,14 +15,13 @@ const TheClubs: React.FC = () => {
     const [clubs, setClubs] = useState<Club[] | { message: string }>({ message: "Načítavam kluby..." });
     const [club, setClub] = useState<Club>(defaultClub);
     const [ClubUI, setClubUI] = useState<openEditCreateUI>();
-    const [renderClubUI, setRenderClubUI] = useState<boolean | null>(null);
-    const [alert, setAlert] = useState<boolean | null>(null);
-    const [alertMessage, setAlertMessage] = useState<string>("");
+    const [renderClubUI, setRenderClubUI] = useState<boolean | null>(null);    
+    const [alert, setAlert] = useState<Alert | null>(null);
 
     //Getting clubs from DB
     const getClubs = async () => {
         axios.get('http://localhost:3002/api/club').then(response => {
-            console.log(response.data);
+            console.log(`🟡 Načítavam všetky kluby`);
             if(Array.isArray(response.data)){
                 setClubs(response.data);
             } else {
@@ -32,42 +31,96 @@ const TheClubs: React.FC = () => {
     };
     const getClubByID = async (id: number) => {
         axios.get(`http://localhost:3002/api/club/${id}`).then(response => {
-            console.log(response.data);
-            setClub(response.data);
+            console.log(`🟡 Načítavam klub s ID: ${id}`);
+            console.log(response.data[0]);
+            setClub(response.data[0]);
         })
     };
     const getSortedClubs = async (key: string) => {
-        console.log(`Sortujem kluby podla ${key}`);
+        console.log(`🟡 Filtrujem všetky kluby podľa: ${key}`);
         axios.get(`http://localhost:3002/api/club?sortBy=${key}`).then(response => {
-            console.log(response.data);
+            if(Array.isArray(response.data)){
+                setClubs(response.data);
+            } else {
+                setClubs({ message: "Nenašli sa žiadne kluby"});
+            }
         })
     };
     const createClub = async (club: CreateClub) => {
-        console.log("Vytváram klub s týmito údajmi: ", club);
-        let code;
-        axios.post('http://localhost:3002/api/club', club).then(response => {
-            console.log(response.request);
-            code = response.status;
-            console.log(`Code: ${code}`);
-            if (code >= 200 && code < 300) {
+        console.log("🟡 Vytváram klub s týmito údajmi: ", club);
+        axios.post('http://localhost:3002/api/club', club).then(async response => {            
+            const code = response.status;            
+            if (code >= 200 && code < 300) {                
+                setAlert({
+                    alertType: true,
+                    alertMessage: "Klub bol úspešne vytvorený"
+                });
+                await getClubs();
                 setRenderClubUI(false);
-                setAlertMessage("Klub bol úspešne vytvorený");
-                setAlert(true);
-            }
-            getClubs();
+            }            
         }).catch(error => {
-            code = error.status;            
-            console.log(`Chyba pri vytváraní klubu: ${code}`);
-            if(code >= 400 && code < 500){
-                setAlertMessage("Nesprávna požiadavka");               
-            }
-            if(code >= 500){
-                setAlertMessage("Chyba pri spracovaní požiadavky");
-            }
-            setRenderClubUI(false);
-            setAlert(false);
+            const code = error.status;            
+            console.log(`🔴 Chyba pri vytváraní klubu: ${code}`);
+            if(code >= 400 && code < 500)
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Nesprávna požiadavka"
+                })                           
+            if(code >= 500)
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Chyba pri spracovaní požiadavky"
+                });             
         });
     };
+    const editClub = async (club: EditClub) => {
+        console.log(`🟡 Editujem klub: ${club.name}`);
+        axios.patch(`http://localhost:3002/api/club/${club.id}`, club).then(async response => {
+            const code = response.status;
+            if(code === 201) {
+                setAlert({
+                    alertType: true,
+                    alertMessage: "Klub bol úspešne upravený"
+                });
+                await getClubs();
+                setRenderClubUI(false);
+            }            
+        }).catch(error => {
+            const code = error.status;            
+            console.log(`🔴 Chyba pri vytváraní klubu: ${code}`);
+            if(code >= 400 && code < 500)
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Nesprávna požiadavka"
+                })                           
+            if(code >= 500)
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Chyba pri spracovaní požiadavky"
+                });  
+        });                
+    };
+    const deleteClub = async (id: number) => {
+        console.log(`🟡 Mažem klub s ID: ${id}`);
+        axios.delete(`http://localhost:3002/api/club/${id}`).then(response => {
+            const code = response.status;
+            if(code === 200) {                
+                setAlert({
+                    alertType: true,
+                    alertMessage: "Klub úspešne vymazaný."
+                });
+            }
+            if(code === 500) 
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Nepodarilo sa vymazať klub"
+                    
+                })
+        });
+        getClubs();
+        setRenderClubUI(false);        
+    };
+   
 
     const handleOpenCreateEditUI = (uiData: openEditCreateUI) => {        
         setClubUI(uiData);
@@ -80,8 +133,7 @@ const TheClubs: React.FC = () => {
             setRenderClubUI(true); 
         }
             
-    };
-    
+    };  
     const handleCloseAlert = () => {
         setAlert(null);
     };
@@ -102,20 +154,22 @@ const TheClubs: React.FC = () => {
             { renderClubUI && (
                 <ClubCreateForm 
                     closeCreateClubUI={() => setRenderClubUI(false)}
-                    handleCreateClub={(club: CreateClub) => createClub(club)} 
+                    handleCreateClub={(club: CreateClub) => createClub(club)}
+                    handleEditClub={(club: EditClub) => editClub(club)} 
+                    handleDeleteClub={(id: number) => deleteClub(id)}
                     clubData={club}
                     formTitle={ClubUI?.message || ""}                
                 />
             )}
-            { alert === true && (
+            { alert?.alertType === true && (
                 <SuccessAlert 
-                    alertMessage={alertMessage}
+                    alertMessage={alert.alertMessage}
                     closeRequest={() => handleCloseAlert()}
                 />
             )}
-            { alert === false && (
+            { alert?.alertType === false && (
                 <FailedAlert 
-                    alertMessage={alertMessage}
+                    alertMessage={alert.alertMessage}
                     closeRequest={() => handleCloseAlert()}
                 />
             )}

@@ -7,8 +7,22 @@ export interface Club {
     ico: string
     mail: string
     tel: string
-    f_name: string
-    surname: string
+    chid: number
+    fname: string
+    sname: string
+}
+export interface EditClub {
+    id: number
+    name?: string
+    city?: string
+    street?: string
+    postal?: string
+    ico?: string
+    mail?: string
+    tel?: string
+    chid?: number
+    fname?: string
+    sname?: string
 }
 export const defaultClub: Club = {
     id: 0,
@@ -19,8 +33,9 @@ export const defaultClub: Club = {
     ico: "",
     mail: "",
     tel: "",
-    f_name: "",
-    surname: ""
+    chid: 0,
+    fname: "",
+    sname: ""
 };
 export interface CreateClub {
     name: string
@@ -35,8 +50,23 @@ export interface openEditCreateUI {
     id: number,
     message: string
 }
-
 export interface Button {
     buttonName: string
     buttonText: string
+}
+export interface Alert {
+    alertType: boolean
+    alertMessage: string
+}
+export interface PersonSelect {
+    id: number,
+    fname: string,
+    sname: string,
+}
+export interface Person {
+    id: number,
+    fname: string,
+    sname: string,
+    birth: string,
+    club?: string
 }

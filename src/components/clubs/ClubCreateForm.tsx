@@ -1,18 +1,26 @@
-import { FormEvent, MouseEvent, useRef, useEffect } from "react";
-import { CreateClub, Club} from "../../assets/types";
+import { FormEvent, MouseEvent, useRef, useEffect, useState } from "react";
+import { CreateClub, EditClub, Club, Button, PersonSelect} from "../../assets/types";
+import axios from 'axios';
+
+
 //Child Components
 import RedButton from "../buttons/RedButton";
 import GreenButton from "../buttons/GreenButton";
 import YellowButton from "../buttons/OrangeButton";
+import SelectElement from "../forms/SelectElement";
 
 interface Props {
     closeCreateClubUI: () => void;
     handleCreateClub: (club: CreateClub) => void;
+    handleEditClub: (club: EditClub) => void;
+    handleDeleteClub: (id: number) => void;
     clubData: Club;
     formTitle: string;
 };
 
-const ClubCreateForm: React.FC<Props> = (props) => {    
+const ClubCreateForm: React.FC<Props> = (props) => {        
+    const [greenButton, setGreenButton] = useState<Button>();
+    const [personWithoutClub, setPersonWithoutClub] = useState<PersonSelect[]>([{ id: 0, fname: "Načítavam osoby...", sname: "" }]);
     const clubNameInput = useRef<HTMLInputElement>(null);
     const clubStreetInput = useRef<HTMLInputElement>(null);
     const clubCityInput = useRef<HTMLInputElement>(null);
@@ -20,8 +28,23 @@ const ClubCreateForm: React.FC<Props> = (props) => {
     const clubIcoInput = useRef<HTMLInputElement>(null);
     const clubTelInput = useRef<HTMLInputElement>(null);
     const clubMailInput = useRef<HTMLInputElement>(null);
-   
-    const handleCreateClubForm = (e: FormEvent<HTMLFormElement>) => {
+    const { clubData } = props;
+
+    const getPersonWithoutClub = async () => {
+        axios.get("http://localhost:3002/api/person/club").then(response => {
+            console.log(`🟡 Načítavam ľudí bez klubu`);
+            if(Array.isArray(response.data) && response.data.length > 0){
+                setPersonWithoutClub(response.data);
+            } else {
+                setPersonWithoutClub([{ id: 0, fname: "Nenašli sa ľudia bez klubu", sname: "" }]);
+            }
+        }).catch(error => {
+            console.error("Error fetching persons without club:", error);
+            setPersonWithoutClub([{ id: 0, fname: "Chyba pri načítaní osôb", sname: "" }]);
+        });
+    }
+
+    const handleClubFormSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
         if (formButton.name === "create") {
@@ -37,39 +60,53 @@ const ClubCreateForm: React.FC<Props> = (props) => {
             }
             props.handleCreateClub(createClubData);
         }
+        if(formButton.name === "update") {
+            console.log("Editujem klub");
+            const editClub: EditClub = {
+                id: clubData.id,
+                name: clubNameInput.current?.value || "",
+                city: clubCityInput.current?.value || "",
+                street: clubStreetInput.current?.value || "",
+                postal: clubPostalInput.current?.value || "",
+                ico: clubIcoInput.current?.value || "",
+                mail: clubMailInput.current?.value || "",
+                tel: clubTelInput.current?.value || "",
+                chid: clubData.chid || 0
+            }
+            props.handleEditClub(editClub);
+        }
+        if(formButton.name === "delete") {
+            console.log("Mažem klub");
+            props.handleDeleteClub(clubData.id);
+        }
     };
 
     const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
+        e.preventDefault();        
         console.log("Ruším vytvorenie klubu");
         props.closeCreateClubUI();
     };
-
+    
+    const handleSelectChange = (id: number) => {
+        clubData.chid = id; // Priama aktualizácia clubData.chid
+    }
     useEffect(() => {
-        console.log(`Hodnoty klub data: ${JSON.stringify(props.clubData)}`);
-    
-        // Skontrolujeme, či `clubData` je pole a či obsahuje aspoň jeden prvok
-        const club = Array.isArray(props.clubData) && props.clubData.length > 0 ? props.clubData[0] : null;        
-        if (club) {
-            console.log(`Idem dať do inputov`);    
-            if (clubNameInput.current) clubNameInput.current.value = club.name;
-            if (clubStreetInput.current) clubStreetInput.current.value = club.street;
-            if (clubCityInput.current) clubCityInput.current.value = club.city;
-            if (clubPostalInput.current) clubPostalInput.current.value = club.postal;
-            if (clubIcoInput.current) clubIcoInput.current.value = club.ico;
-            if (clubTelInput.current) clubTelInput.current.value = club.tel;
-            if (clubMailInput.current) clubMailInput.current.value = club.mail;           
+        if(clubData){
+            if (clubNameInput.current) clubNameInput.current.value = clubData.name;
+            if (clubStreetInput.current) clubStreetInput.current.value = clubData.street;
+            if (clubCityInput.current) clubCityInput.current.value = clubData.city;
+            if (clubPostalInput.current) clubPostalInput.current.value = clubData.postal;
+            if (clubIcoInput.current) clubIcoInput.current.value = clubData.ico;
+            if (clubTelInput.current) clubTelInput.current.value = clubData.tel;
+            if (clubMailInput.current) clubMailInput.current.value = clubData.mail;
         }
-    }, [props.clubData]);
-    const test = Array.isArray(props.clubData) && props.clubData.length > 0 ? props.clubData[0] : null;   
-    console.log(`Test: ${test}`);
-    const greenButtonText = test.id > 0 ? "upraviť" : "vytvoriť";
-    const greenButtonName = test.id > 0 ? "update" : "create";
-    console.log(`Name: ${greenButtonName}, text: ${greenButtonText}`);
-    
-    
-    
-    
+        setGreenButton({
+            buttonName: clubData.id > 0 ? "update" : "create",
+            buttonText: clubData.id > 0 ? "upraviť" : "vytvoriť"                
+        })        
+        if(clubData.id > 0)
+            getPersonWithoutClub();
+    }, [clubData]);
 
     return (
         <section>
@@ -79,7 +116,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-[#F7F9FB] md:text-2xl">
                             {props.formTitle}
                         </h1>
-                        <form className="space-y-4 md:space-y-6" onSubmit={handleCreateClubForm}>
+                        <form className="space-y-4 md:space-y-6" onSubmit={handleClubFormSubmit}>
                             <div className="relative z-0 w-full mb-5 group">
                                 <input
                                     ref={clubNameInput}
@@ -188,24 +225,32 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                                     className="peer-focus:font-medium absolute text-sm text-[#F7F9FB] duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[#D9B310] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                 >Email</label>
                             </div>
+                            {clubData.id > 0 && (
+                                <SelectElement   
+                                    selectOptions={personWithoutClub}                                  
+                                    selectLabel="Štatutár klubu"
+                                    selectedItem={handleSelectChange}
+                                />   
+                            )}
                             <div className="flex flex-row space-x-4 justify-center">
                                 <GreenButton                                     
                                     buttonType="submit"
-                                    buttonName="{redButton.buttonName}"
-                                    buttonText="{redButton.buttonText}"                               
-                                />                           
-                                <RedButton 
+                                    buttonName={greenButton?.buttonName || ""}
+                                    buttonText={greenButton?.buttonText || ""}                             
+                                />                         
+                                <YellowButton 
                                     buttonType="button"
                                     buttonName="cancel"
                                     buttonText="zrušiť"    
                                     clickAction={handleCancelButton} 
                                 />
-                                <YellowButton 
-                                    buttonType="button"
-                                    buttonName="cancel"
-                                    buttonText="vymazať"    
-                                    clickAction={handleCancelButton} 
-                                />
+                                {clubData.id > 0 && (
+                                    <RedButton 
+                                        buttonType="submit"
+                                        buttonName="delete"
+                                        buttonText="vymazať"  
+                                    />
+                                )}
                             </div>
                         </form>
                     </div>
