@@ -3,6 +3,8 @@ import { CreateClub, EditClub, Club, Button, PersonSelect} from "../../assets/ty
 import axios from 'axios';
 
 
+import ComboBox from "../forms/with_secondary_text";
+
 //Child Components
 import RedButton from "../buttons/RedButton";
 import GreenButton from "../buttons/GreenButton";
@@ -31,7 +33,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
     const { clubData } = props;
 
     const getPersonWithoutClub = async () => {
-        axios.get("http://localhost:3002/api/person/club").then(response => {
+        axios.get("http://localhost:3002/api/person/").then(response => {
             console.log(`🟡 Načítavam ľudí bez klubu`);
             if(Array.isArray(response.data) && response.data.length > 0){
                 setPersonWithoutClub(response.data);
@@ -225,6 +227,9 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                                     className="peer-focus:font-medium absolute text-sm text-[#F7F9FB] duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[#D9B310] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                 >Email</label>
                             </div>
+                            <ComboBox 
+                                people={personWithoutClub}
+                            />
                             {clubData.id > 0 && (
                                 <SelectElement   
                                     selectOptions={personWithoutClub}                                  

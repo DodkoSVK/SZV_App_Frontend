@@ -1,4 +1,4 @@
-import { Person } from "../../assets/types";
+import { Person, openEditCreateUI } from "../../assets/types/index";
 import { useRef, MouseEvent } from "react";
 import editIcon from '../../assets/edit.svg';
 import plusIcon from '../../assets/plus.svg';
@@ -6,6 +6,7 @@ import plusIcon from '../../assets/plus.svg';
 interface Props {
     persons: Person[] | { message: string };
     sortBy: (key: string) => void;
+    uiHandler: (data: openEditCreateUI) => void
 }
 
 const PersonsTable: React.FC<Props> = (props) => {
@@ -23,9 +24,9 @@ const PersonsTable: React.FC<Props> = (props) => {
         console.log(`Editujem klub s id: ${id}`);
         //props.uiHandler({ id: id, message: "Editácia klubu",});
     }
-    const handleAddClub = () => {
-        console.log('Pridávam nový klub');
-        //props.uiHandler({ id: 0, message: "Vytvorenie klubu",});
+    const handleAdd = () => {
+        console.log('Pridávam novú osobu.');
+        props.uiHandler({ id: 0, message: "Vytvorenie osoby",});
     }
 
     return (
@@ -87,7 +88,7 @@ const PersonsTable: React.FC<Props> = (props) => {
                         </th>
                         <th scope="col" className="px-6 py-3">
                             <div className="flex items-center">
-                                <button onClick={() => handleAddClub()} className="flex items-center space-x-2 uppercase">
+                                <button onClick={() => handleAdd()} className="flex items-center space-x-2 uppercase">
                                     <span>Pridať človeka</span>
                                     <img src={plusIcon} alt="Add" className="w-6 h-6" />
                                 </button>

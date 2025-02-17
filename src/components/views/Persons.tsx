@@ -1,14 +1,18 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 //Types
-import { Person } from "../../assets/types";
+import { openEditCreateUI, Person } from "../../assets/types";
 //Children Components
 import PersonsTable from "../persons/PersonsTable";
+import PersonForm from "../persons/PersonForm";
 
 
 //Component
 const ThePersons: React.FC = () => {
+    //useStates
     const [persons, setPersons] = useState<Person[] | { message: string }>({ message: "Načítavam osoby..." });
+    const [renderFormUi, setRenderFormUi] = useState<boolean | null>(null);
+    const [formUi, setFormUi] = useState<openEditCreateUI>();
 
     const getPersons = async () => {
         axios.get('http://localhost:3002/api/person').then(response => {
@@ -30,6 +34,11 @@ const ThePersons: React.FC = () => {
             }
         })
     };
+
+    const handleOpenFormUI = (formUiData: openEditCreateUI) => {
+        setFormUi(formUiData);
+        setRenderFormUi(true);
+    }
     useEffect(() => {
         getPersons();
     }, [])
@@ -41,7 +50,10 @@ const ThePersons: React.FC = () => {
             <PersonsTable 
                 persons={persons}
                 sortBy={(key: string) => getSortedPersons(key)}
+                uiHandler={(data: openEditCreateUI)=> handleOpenFormUI(data)}
             />
+            
+
         </article>
     )
 };

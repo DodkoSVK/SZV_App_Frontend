@@ -62,6 +62,7 @@ export interface PersonSelect {
     id: number,
     fname: string,
     sname: string,
+    club: string
 }
 export interface Person {
     id: number,
