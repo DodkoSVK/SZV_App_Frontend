@@ -1,16 +1,22 @@
 import { FormEvent, MouseEvent, useRef, useEffect, useState } from "react";
 import { CreateClub, EditClub, Club, Button, PersonSelect} from "../../assets/types";
 import axios from 'axios';
-
-
-import ComboBox from "../forms/with_secondary_text";
-
 //Child Components
 import RedButton from "../buttons/RedButton";
 import GreenButton from "../buttons/GreenButton";
 import YellowButton from "../buttons/OrangeButton";
-import SelectElement from "../forms/SelectElement";
+import ComboBox from "../forms/ComboBox";
 
+/**
+ * closeCreateClubUI -> Closing form UI
+ * handleCreateClub -> handle create a new club, sending club data
+ * handleEditClub -> handle edit an existing club, sending club data
+ * handleDeleteClub -> handle delete an existing club, sending club id
+ * clubData -> getting data about existing club to edit
+ * formTitle -> title for form
+ *
+ * @interface Props
+ */
 interface Props {
     closeCreateClubUI: () => void;
     handleCreateClub: (club: CreateClub) => void;
@@ -21,8 +27,10 @@ interface Props {
 };
 
 const ClubCreateForm: React.FC<Props> = (props) => {        
+    // UseStates
     const [greenButton, setGreenButton] = useState<Button>();
-    const [personWithoutClub, setPersonWithoutClub] = useState<PersonSelect[]>([{ id: 0, fname: "Načítavam osoby...", sname: "" }]);
+    const [personWithoutClub, setPersonWithoutClub] = useState<PersonSelect[]>([{ id: 0, fname: "Načítavam osoby...", sname: "", club: "" }]);
+    // Form Refs
     const clubNameInput = useRef<HTMLInputElement>(null);
     const clubStreetInput = useRef<HTMLInputElement>(null);
     const clubCityInput = useRef<HTMLInputElement>(null);
@@ -30,27 +38,34 @@ const ClubCreateForm: React.FC<Props> = (props) => {
     const clubIcoInput = useRef<HTMLInputElement>(null);
     const clubTelInput = useRef<HTMLInputElement>(null);
     const clubMailInput = useRef<HTMLInputElement>(null);
+    //Props const
     const { clubData } = props;
 
+    // NEED CHANGE FROM PEOPLES !
     const getPersonWithoutClub = async () => {
         axios.get("http://localhost:3002/api/person/").then(response => {
             console.log(`🟡 Načítavam ľudí bez klubu`);
             if(Array.isArray(response.data) && response.data.length > 0){
                 setPersonWithoutClub(response.data);
             } else {
-                setPersonWithoutClub([{ id: 0, fname: "Nenašli sa ľudia bez klubu", sname: "" }]);
+                setPersonWithoutClub([{ id: 0, fname: "Nenašli sa ľudia bez klubu", sname: "", club: "" }]);
             }
         }).catch(error => {
             console.error("Error fetching persons without club:", error);
-            setPersonWithoutClub([{ id: 0, fname: "Chyba pri načítaní osôb", sname: "" }]);
+            setPersonWithoutClub([{ id: 0, fname: "Chyba pri načítaní osôb", sname: "", club: ""  }]);
         });
     }
 
-    const handleClubFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    /**
+     * Handle submit event create, update or delete club
+     *
+     * @param {FormEvent<HTMLFormElement>} e -> Clicked submit button
+     */
+    const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
         if (formButton.name === "create") {
-            console.log("Vytváram klub");
+            //console.log("Vytváram klub");
             const createClubData: CreateClub = {
                 name: clubNameInput.current?.value || "",
                 city: clubCityInput.current?.value || "",
@@ -63,7 +78,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
             props.handleCreateClub(createClubData);
         }
         if(formButton.name === "update") {
-            console.log("Editujem klub");
+            //console.log("Editujem klub");
             const editClub: EditClub = {
                 id: clubData.id,
                 name: clubNameInput.current?.value || "",
@@ -78,22 +93,32 @@ const ClubCreateForm: React.FC<Props> = (props) => {
             props.handleEditClub(editClub);
         }
         if(formButton.name === "delete") {
-            console.log("Mažem klub");
+            //console.log("Mažem klub");
             props.handleDeleteClub(clubData.id);
         }
     };
-
+    /**
+     * Handle for close form UI
+     *
+     * @param {MouseEvent<HTMLButtonElement>} e -> Clicked button
+     */
     const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();        
         console.log("Ruším vytvorenie klubu");
         props.closeCreateClubUI();
     };
     
+    /**
+     * Get person ID from ComboBox to clubdata
+     *
+     * @param {number} id => Club chairman ID
+     */
     const handleSelectChange = (id: number) => {
-        clubData.chid = id; // Priama aktualizácia clubData.chid
+        clubData.chid = id; 
     }
+        
     useEffect(() => {
-        if(clubData){
+        if(clubData.id > 0){
             if (clubNameInput.current) clubNameInput.current.value = clubData.name;
             if (clubStreetInput.current) clubStreetInput.current.value = clubData.street;
             if (clubCityInput.current) clubCityInput.current.value = clubData.city;
@@ -105,9 +130,18 @@ const ClubCreateForm: React.FC<Props> = (props) => {
         setGreenButton({
             buttonName: clubData.id > 0 ? "update" : "create",
             buttonText: clubData.id > 0 ? "upraviť" : "vytvoriť"                
-        })        
-        if(clubData.id > 0)
-            getPersonWithoutClub();
+        })                
+        getPersonWithoutClub();
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                handleCancelButton(event as unknown as MouseEvent<HTMLButtonElement>);
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
     }, [clubData]);
 
     return (
@@ -118,7 +152,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-[#F7F9FB] md:text-2xl">
                             {props.formTitle}
                         </h1>
-                        <form className="space-y-4 md:space-y-6" onSubmit={handleClubFormSubmit}>
+                        <form className="space-y-4 md:space-y-6" onSubmit={handleFormSubmit}>
                             <div className="relative z-0 w-full mb-5 group">
                                 <input
                                     ref={clubNameInput}
@@ -229,14 +263,8 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                             </div>
                             <ComboBox 
                                 people={personWithoutClub}
-                            />
-                            {clubData.id > 0 && (
-                                <SelectElement   
-                                    selectOptions={personWithoutClub}                                  
-                                    selectLabel="Štatutár klubu"
-                                    selectedItem={handleSelectChange}
-                                />   
-                            )}
+                                onSelectChange={(id:number) => handleSelectChange(id)}
+                            />                            
                             <div className="flex flex-row space-x-4 justify-center">
                                 <GreenButton                                     
                                     buttonType="submit"
