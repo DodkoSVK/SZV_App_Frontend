@@ -4,18 +4,17 @@ import { useEffect, useState } from "react";
 import { openEditCreateUI, Person } from "../../assets/types";
 //Children Components
 import PersonsTable from "../persons/PersonsTable";
-import PersonForm from "../persons/PersonForm";
 
 
 //Component
 const ThePersons: React.FC = () => {
     //useStates
-    const [persons, setPersons] = useState<Person[] | { message: string }>({ message: "Načítavam osoby..." });
+    const [persons, setPersons] = useState<Person[] | { message: string }>({ message: "Načítavam osoby..." });/* 
     const [renderFormUi, setRenderFormUi] = useState<boolean | null>(null);
     const [formUi, setFormUi] = useState<openEditCreateUI>();
-
+ */
     const getPersons = async () => {
-        axios.get('http://localhost:3002/api/person').then(response => {
+        axios.get('htpps://app.vzpieranie.sk:3002/api/person').then(response => {
             console.log(`🟡 Načítavam všetky osoby`);
             if(Array.isArray(response.data)){
                 setPersons(response.data);
@@ -26,7 +25,7 @@ const ThePersons: React.FC = () => {
     };
     const getSortedPersons = async (key: string) => {
         console.log(`🟡 Filtrujem všetky kluby podľa: ${key}`);
-        axios.get(`http://localhost:3002/api/person?sortBy=${key}`).then(response => {
+        axios.get(`htpps://app.vzpieranie.sk:3002/api/person?sortBy=${key}`).then(response => {
             if(Array.isArray(response.data)){
                 setPersons(response.data);
             } else {
@@ -36,8 +35,9 @@ const ThePersons: React.FC = () => {
     };
 
     const handleOpenFormUI = (formUiData: openEditCreateUI) => {
-        setFormUi(formUiData);
-        setRenderFormUi(true);
+        /* setFormUi(formUiData);
+        setRenderFormUi(true); */
+        console.log(`Ta daco: ${formUiData}`);
     }
     useEffect(() => {
         getPersons();

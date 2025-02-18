@@ -43,7 +43,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
 
     // NEED CHANGE FROM PEOPLES !
     const getPersonWithoutClub = async () => {
-        axios.get("http://localhost:3002/api/person/").then(response => {
+        axios.get("https://app.vzpieranie.skgit ad:3002/api/person/").then(response => {
             console.log(`🟡 Načítavam ľudí bez klubu`);
             if(Array.isArray(response.data) && response.data.length > 0){
                 setPersonWithoutClub(response.data);

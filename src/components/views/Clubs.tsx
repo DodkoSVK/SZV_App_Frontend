@@ -20,7 +20,7 @@ const TheClubs: React.FC = () => {
 
     //Getting clubs from DB
     const getClubs = async () => {
-        axios.get('http://localhost:3002/api/club').then(response => {
+        axios.get('htpps://app.vzpieranie.sk:3002/api/club').then(response => {
             console.log(`🟡 Načítavam všetky kluby`);
             if(Array.isArray(response.data)){
                 setClubs(response.data);
@@ -30,7 +30,7 @@ const TheClubs: React.FC = () => {
         })
     };
     const getClubByID = async (id: number) => {
-        axios.get(`http://localhost:3002/api/club/${id}`).then(response => {
+        axios.get(`htpps://app.vzpieranie.sk:3002/api/club/${id}`).then(response => {
             console.log(`🟡 Načítavam klub s ID: ${id}`);
             console.log(response.data[0]);
             setClub(response.data[0]);
@@ -38,7 +38,7 @@ const TheClubs: React.FC = () => {
     };
     const getSortedClubs = async (key: string) => {
         console.log(`🟡 Filtrujem všetky kluby podľa: ${key}`);
-        axios.get(`http://localhost:3002/api/club?sortBy=${key}`).then(response => {
+        axios.get(`htpps://app.vzpieranie.sk:3002/api/club?sortBy=${key}`).then(response => {
             if(Array.isArray(response.data)){
                 setClubs(response.data);
             } else {
@@ -48,7 +48,7 @@ const TheClubs: React.FC = () => {
     };
     const createClub = async (club: CreateClub) => {
         console.log("🟡 Vytváram klub s týmito údajmi: ", club);
-        axios.post('http://localhost:3002/api/club', club).then(async response => {            
+        axios.post('htpps://app.vzpieranie.sk:3002/api/club', club).then(async response => {            
             const code = response.status;            
             if (code >= 200 && code < 300) {                
                 setAlert({
@@ -75,7 +75,7 @@ const TheClubs: React.FC = () => {
     };
     const editClub = async (club: EditClub) => {
         console.log(`🟡 Editujem klub: ${club.name}`);
-        axios.patch(`http://localhost:3002/api/club/${club.id}`, club).then(async response => {
+        axios.patch(`htpps://app.vzpieranie.sk:3002/api/club/${club.id}`, club).then(async response => {
             const code = response.status;
             if(code === 201) {
                 setAlert({
@@ -102,7 +102,7 @@ const TheClubs: React.FC = () => {
     };
     const deleteClub = async (id: number) => {
         console.log(`🟡 Mažem klub s ID: ${id}`);
-        axios.delete(`http://localhost:3002/api/club/${id}`).then(response => {
+        axios.delete(`htpps://app.vzpieranie.sk:3002/api/club/${id}`).then(response => {
             const code = response.status;
             if(code === 200) {                
                 setAlert({
