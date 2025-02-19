@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { PersonSelect } from "../../assets/types";
+import { PersonSelect } from "../../assets/types/personTypes";
 
 interface Props {
     selectOptions: PersonSelect[];
