@@ -1,6 +1,8 @@
 import { FormEvent, MouseEvent, useRef, useEffect, useState } from "react";
-import { CreateClub, EditClub, Club, Button, PersonSelect} from "../../assets/types";
-import axios from 'axios';
+import { Club, EditClub, CreateClub } from "../../assets/types/clubTypes";
+import { getPersons } from "../../apis/PersonApis";
+import { PersonSelect } from "../../assets/types/personTypes";
+import { Button } from "../../assets/types";
 //Child Components
 import RedButton from "../buttons/RedButton";
 import GreenButton from "../buttons/GreenButton";
@@ -22,14 +24,14 @@ interface Props {
     handleCreateClub: (club: CreateClub) => void;
     handleEditClub: (club: EditClub) => void;
     handleDeleteClub: (id: number) => void;
-    clubData: Club;
-    formTitle: string;
+    clubData?: Club;
+    formTitle?: string;
 };
 
 const ClubCreateForm: React.FC<Props> = (props) => {        
     // UseStates
     const [greenButton, setGreenButton] = useState<Button>();
-    const [personWithoutClub, setPersonWithoutClub] = useState<PersonSelect[]>([{ id: 0, fname: "Načítavam osoby...", sname: "", club: "" }]);
+    const [persons, setPersons] = useState<PersonSelect[] | { message: string}>();
     // Form Refs
     const clubNameInput = useRef<HTMLInputElement>(null);
     const clubStreetInput = useRef<HTMLInputElement>(null);
@@ -42,18 +44,8 @@ const ClubCreateForm: React.FC<Props> = (props) => {
     const { clubData } = props;
 
     // NEED CHANGE FROM PEOPLES !
-    const getPersonWithoutClub = async () => {
-        axios.get("https://app.vzpieranie.skgit ad:3002/api/person/").then(response => {
-            console.log(`🟡 Načítavam ľudí bez klubu`);
-            if(Array.isArray(response.data) && response.data.length > 0){
-                setPersonWithoutClub(response.data);
-            } else {
-                setPersonWithoutClub([{ id: 0, fname: "Nenašli sa ľudia bez klubu", sname: "", club: "" }]);
-            }
-        }).catch(error => {
-            console.error("Error fetching persons without club:", error);
-            setPersonWithoutClub([{ id: 0, fname: "Chyba pri načítaní osôb", sname: "", club: ""  }]);
-        });
+    const fetchPersons = async () => {
+        setPersons(await getPersons());
     }
 
     /**
@@ -80,7 +72,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
         if(formButton.name === "update") {
             //console.log("Editujem klub");
             const editClub: EditClub = {
-                id: clubData.id,
+                id: clubData?.id || 0,
                 name: clubNameInput.current?.value || "",
                 city: clubCityInput.current?.value || "",
                 street: clubStreetInput.current?.value || "",
@@ -88,13 +80,15 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                 ico: clubIcoInput.current?.value || "",
                 mail: clubMailInput.current?.value || "",
                 tel: clubTelInput.current?.value || "",
-                chid: clubData.chid || 0
+                chid: clubData?.chid || 0
             }
             props.handleEditClub(editClub);
         }
         if(formButton.name === "delete") {
             //console.log("Mažem klub");
-            props.handleDeleteClub(clubData.id);
+            if (clubData) {
+                props.handleDeleteClub(clubData.id);
+            }
         }
     };
     /**
@@ -114,11 +108,12 @@ const ClubCreateForm: React.FC<Props> = (props) => {
      * @param {number} id => Club chairman ID
      */
     const handleSelectChange = (id: number) => {
-        clubData.chid = id; 
+        if (clubData)
+            clubData.chid = id; 
     }
         
     useEffect(() => {
-        if(clubData.id > 0){
+        if(clubData && clubData.id > 0){
             if (clubNameInput.current) clubNameInput.current.value = clubData.name;
             if (clubStreetInput.current) clubStreetInput.current.value = clubData.street;
             if (clubCityInput.current) clubCityInput.current.value = clubData.city;
@@ -126,12 +121,12 @@ const ClubCreateForm: React.FC<Props> = (props) => {
             if (clubIcoInput.current) clubIcoInput.current.value = clubData.ico;
             if (clubTelInput.current) clubTelInput.current.value = clubData.tel;
             if (clubMailInput.current) clubMailInput.current.value = clubData.mail;
-        }
+        } 
         setGreenButton({
-            buttonName: clubData.id > 0 ? "update" : "create",
-            buttonText: clubData.id > 0 ? "upraviť" : "vytvoriť"                
-        })                
-        getPersonWithoutClub();
+            buttonName: clubData && clubData.id ? "update" : "create",
+            buttonText: clubData && clubData.id ? "upraviť" : "vytvoriť"                
+        })
+        fetchPersons();
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -142,7 +137,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [clubData]);
+    }, []);
 
     return (
         <section>
@@ -262,7 +257,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                                 >Email</label>
                             </div>
                             <ComboBox 
-                                people={personWithoutClub}
+                                people={Array.isArray(persons) ? persons : []}
                                 onSelectChange={(id:number) => handleSelectChange(id)}
                             />                            
                             <div className="flex flex-row space-x-4 justify-center">
@@ -277,7 +272,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                                     buttonText="zrušiť"    
                                     clickAction={handleCancelButton} 
                                 />
-                                {clubData.id > 0 && (
+                                {clubData && clubData.id > 0 && (
                                     <RedButton 
                                         buttonType="submit"
                                         buttonName="delete"

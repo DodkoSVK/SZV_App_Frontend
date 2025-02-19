@@ -1,26 +1,10 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
-'use client'
-
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions, Label } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
-import { PersonSelect } from '../../assets/types'
+import { PersonSelect } from '../../assets/types/personTypes'
 
 interface Props {
-  people: PersonSelect[]
+  people: PersonSelect[];
   onSelectChange: (id: number) => void; // Pridanie funkcie na vrátenie ID rodičovi
 }
 
@@ -48,7 +32,7 @@ const ComboBox: React.FC<Props> = (props) => {
       onChange={(person: PersonSelect) => {
         setQuery('')
         setSelectedPerson(person);
-        onSelectChange(person.id) // Zavolanie funkcie na vrátenie ID rodičovi
+        if (person?.id) onSelectChange(person.id);         
       }}
     >
       <Label className="text-sm text-[#F7F9FB]">Štatutár klubu</Label>

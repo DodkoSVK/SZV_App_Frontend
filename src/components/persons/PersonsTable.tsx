@@ -1,4 +1,4 @@
-import { Person, openEditCreateUI } from "../../assets/types/index";
+import { Person } from "../../assets/types/personTypes";
 import { useRef, MouseEvent } from "react";
 import editIcon from '../../assets/edit.svg';
 import plusIcon from '../../assets/plus.svg';
@@ -6,7 +6,7 @@ import plusIcon from '../../assets/plus.svg';
 interface Props {
     persons: Person[] | { message: string };
     sortBy: (key: string) => void;
-    uiHandler: (data: openEditCreateUI) => void
+    uiHandler: (personId: number ) => void
 }
 
 const PersonsTable: React.FC<Props> = (props) => {
@@ -22,11 +22,11 @@ const PersonsTable: React.FC<Props> = (props) => {
     }
     const handleEdit = (id: number) => {
         console.log(`Editujem klub s id: ${id}`);
-        //props.uiHandler({ id: id, message: "Editácia klubu",});
+        props.uiHandler(id);
     }
     const handleAdd = () => {
         console.log('Pridávam novú osobu.');
-        props.uiHandler({ id: 0, message: "Vytvorenie osoby",});
+        props.uiHandler(0);
     }
 
     return (

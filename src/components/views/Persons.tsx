@@ -1,46 +1,40 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import { getPersons, getSortedPersons } from "../../apis/PersonApis";
 //Types
-import { openEditCreateUI, Person } from "../../assets/types";
+import { Person, defaultPerson } from "../../assets/types/personTypes";
 //Children Components
 import PersonsTable from "../persons/PersonsTable";
+import { FormUI } from "../../assets/types";
 
 
 //Component
 const ThePersons: React.FC = () => {
     //useStates
-    const [persons, setPersons] = useState<Person[] | { message: string }>({ message: "Načítavam osoby..." });/* 
-    const [renderFormUi, setRenderFormUi] = useState<boolean | null>(null);
-    const [formUi, setFormUi] = useState<openEditCreateUI>();
- */
-    const getPersons = async () => {
-        axios.get('https://app.vzpieranie.sk:3002/api/person').then(response => {
-            console.log(`🟡 Načítavam všetky osoby`);
-            if(Array.isArray(response.data)){
-                setPersons(response.data);
-            } else {
-                setPersons({ message: "Nenašli sa žiadne osoby"});
-            }
-        })
-    };
-    const getSortedPersons = async (key: string) => {
-        console.log(`🟡 Filtrujem všetky kluby podľa: ${key}`);
-        axios.get(`https://app.vzpieranie.sk:3002/api/person?sortBy=${key}`).then(response => {
-            if(Array.isArray(response.data)){
-                setPersons(response.data);
-            } else {
-                setPersons({ message: "Nenašli sa žiadne kluby"});
-            }
-        })
-    };
+    const [persons, setPersons] = useState<Person[] | { message: string }>({ message: "Načítavam osoby..." });
+    const [editingPerson, setEditingPerson] = useState<Person>();
+    const [formUI, setFormUI] = useState<FormUI | null>(null);
 
-    const handleOpenFormUI = (formUiData: openEditCreateUI) => {
-        /* setFormUi(formUiData);
-        setRenderFormUi(true); */
-        console.log(`Ta daco: ${formUiData}`);
+    const fetchPersons = async () => {
+        setPersons(await getPersons());
+    }    
+    const fetchSortedPersons = async (key: string) => {
+        setPersons(await getSortedPersons(key));
+    }
+
+    const findPersonByID = (id: number) => {
+        if (Array.isArray(persons)) {
+            setEditingPerson(persons.find(person => person.id === id) || defaultPerson);
+        }
+    }
+    const handleFormUi = (personId: number) => {
+        if(personId === 0) setFormUI({ state: true, formTitle: "Vytvoriť novú osobu" });  
+        if(personId > 1) {
+            findPersonByID(personId);            
+            setFormUI({ state: true, formTitle: "Upraviť osobu" }); 
+        }  
     }
     useEffect(() => {
-        getPersons();
+        fetchPersons();
     }, [])
     return (
         <article>
@@ -49,11 +43,9 @@ const ThePersons: React.FC = () => {
             </div>
             <PersonsTable 
                 persons={persons}
-                sortBy={(key: string) => getSortedPersons(key)}
-                uiHandler={(data: openEditCreateUI)=> handleOpenFormUI(data)}
-            />
-            
-
+                sortBy={(key: string) => fetchSortedPersons(key)}
+                uiHandler={(personId: number)=> handleFormUi(personId)}
+            />          
         </article>
     )
 };

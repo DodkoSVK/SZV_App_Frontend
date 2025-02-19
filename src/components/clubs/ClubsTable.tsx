@@ -1,4 +1,4 @@
-import { Club, openEditCreateUI } from '../../assets/types/index';
+import { Club } from '../../assets/types/clubTypes';
 import { useRef, MouseEvent } from 'react';
 import editIcon from '../../assets/edit.svg';
 import plusIcon from '../../assets/plus.svg';
@@ -6,7 +6,7 @@ import plusIcon from '../../assets/plus.svg';
 interface Props {
     clubs: Club[] | { message: string };
     sortBy: (key: string) => void;
-    uiHandler: (data: openEditCreateUI) => void;
+    uiHandler: (clubId: number) => void;
 }
 
 const ClubsTable: React.FC<Props> = (props) => {
@@ -20,12 +20,12 @@ const ClubsTable: React.FC<Props> = (props) => {
         props.sortBy(buttonName);
     };
     const handleEdit = (id: number) => {
-        console.log(`Editujem klub s id: ${id}`);
-        props.uiHandler({ id: id, message: "Editácia klubu",});
+        //console.log(`Editujem klub s id: ${id}`);
+        props.uiHandler(id);
     }
     const handleAddClub = () => {
-        console.log('Pridávam nový klub');
-        props.uiHandler({ id: 0, message: "Vytvorenie klubu",});
+        //console.log('Pridávam nový klub');
+        props.uiHandler(0);
     }
     return (
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg mx-10 rounded-sm border border-gray-500 border-solid">
