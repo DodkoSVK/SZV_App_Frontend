@@ -21,11 +21,11 @@ const PersonsTable: React.FC<Props> = (props) => {
         props.sortBy(buttonName);
     }
     const handleEdit = (id: number) => {
-        console.log(`Editujem klub s id: ${id}`);
+        //console.log(`Editujem klub s id: ${id}`);
         props.uiHandler(id);
     }
     const handleAdd = () => {
-        console.log('Pridávam novú osobu.');
+        //console.log('Pridávam novú osobu.');
         props.uiHandler(0);
     }
 

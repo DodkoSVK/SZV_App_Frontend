@@ -3,7 +3,7 @@ import { useRef } from "react";
 
 
 interface Props {
-    formTitle: string
+    formTitle?: string
 }
 
 const PersonForm: React.FC<Props> = (props) => {

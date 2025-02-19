@@ -84,10 +84,6 @@ const TheClubs: React.FC = () => {
         })
     }; */
     
-    
-    
-    
-    
     const findClubByID = (id: number) => {
         if (Array.isArray(clubs)) {
             setEditingClub(clubs.find(club => club.id === id) || defaultClub);
@@ -120,12 +116,12 @@ const TheClubs: React.FC = () => {
             />
             { formUI?.state && (
                 <ClubForm 
+                    clubData={editingClub}
+                    formTitle={formUI?.formTitle}   
                     closeCreateClubUI={() => setFormUI({ state: false })}
                     handleCreateClub={(club: CreateClub) => submitClub(club)}
                     handleEditClub={(club: EditClub) => updateClub(club)} 
-                    handleDeleteClub={(id: number) => removeClub(id)}
-                    clubData={editingClub}
-                    formTitle={formUI?.formTitle}                
+                    handleDeleteClub={(id: number) => removeClub(id)}                                 
                 />
             )}
             { alert?.alertType === true && (
