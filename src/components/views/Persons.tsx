@@ -14,7 +14,7 @@ const ThePersons: React.FC = () => {
     const [formUi, setFormUi] = useState<openEditCreateUI>();
  */
     const getPersons = async () => {
-        axios.get('htpps://app.vzpieranie.sk:3002/api/person').then(response => {
+        axios.get('https://app.vzpieranie.sk:3002/api/person').then(response => {
             console.log(`🟡 Načítavam všetky osoby`);
             if(Array.isArray(response.data)){
                 setPersons(response.data);
@@ -25,7 +25,7 @@ const ThePersons: React.FC = () => {
     };
     const getSortedPersons = async (key: string) => {
         console.log(`🟡 Filtrujem všetky kluby podľa: ${key}`);
-        axios.get(`htpps://app.vzpieranie.sk:3002/api/person?sortBy=${key}`).then(response => {
+        axios.get(`https://app.vzpieranie.sk:3002/api/person?sortBy=${key}`).then(response => {
             if(Array.isArray(response.data)){
                 setPersons(response.data);
             } else {
