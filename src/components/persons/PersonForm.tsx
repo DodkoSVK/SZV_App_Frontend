@@ -1,18 +1,45 @@
-import { useRef } from "react";
+import { useEffect, useRef, MouseEvent } from "react";
+//Types
+import { Person } from "../../assets/types/personTypes";
 //Childerns
-
+import DateElement from "../forms/DateElement";
 
 interface Props {
-    formTitle?: string
+    formTitle?: string;
+    personData?: Person;
+    handleCloseUI: () => void;
 }
 
 const PersonForm: React.FC<Props> = (props) => {
     const fnameInput = useRef<HTMLInputElement>(null);
     const sNameInput = useRef<HTMLInputElement>(null);
 
+    const { personData } = props;
+
     const handleClubFormSubmit = async () => {
         console.log(`Posielam formulat`);
     }
+    const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();        
+        console.log("Ruším vytvorenie klubu");
+        props.handleCloseUI();
+    };
+    useEffect(() => {
+        if(personData && personData.id > 0) {
+            if(fnameInput.current) fnameInput.current.value = personData.fname;
+            if(sNameInput.current) sNameInput.current.value = personData.sname;
+        }
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            handleCancelButton(event as unknown as MouseEvent<HTMLButtonElement>);
+        }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    })
 
     return (
         <section>
@@ -53,7 +80,9 @@ const PersonForm: React.FC<Props> = (props) => {
                                     className="peer-focus:font-medium absolute text-sm text-[#F7F9FB] duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[#D9B310] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                                 >Priezvisko</label>
                             </div>
-                                                                              
+                            <DateElement 
+                                placeholder="Datum"
+                            />                                                  
                             {/*
                             {clubData.id > 0 && (
                                 <SelectElement   

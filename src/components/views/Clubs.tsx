@@ -118,7 +118,7 @@ const TheClubs: React.FC = () => {
                 <ClubForm 
                     clubData={editingClub}
                     formTitle={formUI?.formTitle}   
-                    closeCreateClubUI={() => setFormUI({ state: false })}
+                    handleCloseUI={() => setFormUI({ state: false })}
                     handleCreateClub={(club: CreateClub) => submitClub(club)}
                     handleEditClub={(club: EditClub) => updateClub(club)} 
                     handleDeleteClub={(id: number) => removeClub(id)}                                 

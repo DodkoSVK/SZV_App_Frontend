@@ -20,7 +20,7 @@ import ComboBox from "../forms/ComboBox";
  * @interface Props
  */
 interface Props {
-    closeCreateClubUI: () => void;
+    handleCloseUI: () => void;
     handleCreateClub: (club: CreateClub) => void;
     handleEditClub: (club: EditClub) => void;
     handleDeleteClub: (id: number) => void;
@@ -99,7 +99,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
     const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();        
         console.log("Ruším vytvorenie klubu");
-        props.closeCreateClubUI();
+        props.handleCloseUI();
     };
     
     /**

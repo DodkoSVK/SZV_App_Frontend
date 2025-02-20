@@ -1,4 +1,4 @@
-import { useEffect, useState, FormEvent, MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { getPersons, getSortedPersons } from "../../apis/PersonApis";
 //Types
 import { Person, defaultPerson } from "../../assets/types/personTypes";
@@ -29,28 +29,15 @@ const ThePersons: React.FC = () => {
     }
     const handleOpenFormUi = (personId: number) => {
         if(personId === 0) setFormUI({ state: true, formTitle: "Vytvoriť novú osobu" });  
-        if(personId > 1) {
+        else if(personId > 1) {
             findPersonByID(personId);            
             setFormUI({ state: true, formTitle: "Upraviť osobu" }); 
-        }  
-        console.log(`Editing person: ${editingPerson}`);
+        }          
     };
-     const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
-            e.preventDefault();        
-            console.log("Ruším vytvorenie klubu");
-            //props.closeCreateClubUI();
-    };
+    
     useEffect(() => {
         fetchPersons();
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                handleCancelButton(event as unknown as MouseEvent<HTMLButtonElement>);
-            }
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
+        
     }, [])
     return (
         <article>
@@ -65,6 +52,8 @@ const ThePersons: React.FC = () => {
             { formUI?.state && (
                 <PersonForm 
                     formTitle={formUI?.formTitle}
+                    personData={editingPerson}
+                    handleCloseUI={() => setFormUI({ state: false})}
                 />
             )}      
         </article>
