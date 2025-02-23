@@ -2,26 +2,37 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import 'dayjs/locale/sk';
-import { useEffect, useState } from "react";
-
-import arrow from "../../assets/arrow-left.svg"
+import { useEffect, useState,useRef, MouseEvent } from "react";
+//Types
+import { SelectingDate, SelectedDate, DateInformation } from "../../assets/types/datePicker";
+//Children
+import MonthPicker from "../dateElement/MonthPicker";
+import YearPicker from "../dateElement/YearPicker";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.locale("sk");
 
 interface Props {
-  elementLabel: string
+  dateValue: string
+  elementLabel: string 
+  handleSetDate: (date: string) => void;
 }
 
 const DateElement: React.FC<Props> = (props) => {
-  const [selectedYear, setSelectedYear] = useState<number>(dayjs().tz("Europe/Bratislava").year());
-  const [selectedMonth, setSelectedMonth] = useState<number>(dayjs().tz("Europe/Bratislava").month());
-  const [monthDays, setMonthDays] = useState<number[]>([]);
-  console.log(`Aktualny rok: ${selectedYear}`)
-  console.log(`Aktualne dni mesiaca: ${monthDays}`);
-
-  const { elementLabel } = props;
+  //useState
+  const [selectingState, setSelectingState] = useState<SelectingDate>();
+  const [selectedDate, setSelectedDate] = useState<SelectedDate>({
+    year: dayjs().tz("Europe/Bratislava").year(),
+    month: dayjs().tz("Europe/Bratislava").month(),    
+    day: dayjs().tz("Europe/Bratislava").date(),   
+  }); 
+  const [dateInfo, setDateInfo] = useState<DateInformation | null>(null);  
+  //useRef
+  const dateInput = useRef<HTMLInputElement>(null);
+  const calendar = useRef<HTMLDivElement>(null);
+  //Props
+  const { dateValue, elementLabel, handleSetDate } = props;  
 
   const splitToWeeks = (days: number[]) => {
     const weeks: number [][] = [];
@@ -29,19 +40,81 @@ const DateElement: React.FC<Props> = (props) => {
       weeks.push(days.slice(i, i +7));
     }
     return weeks;
+  }; 
+  const handleDateInputValue = (date: string) => {
+    if(dateInput.current)
+      dateInput.current.value = date
+  }
+  const handleMonthChange = (e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const elementId = e.currentTarget.id;  
+    if (elementId === "previousMonth") {
+      if (selectedDate.month === 0) {
+        setSelectedDate({ 
+          ...selectedDate, 
+          year: selectedDate.year - 1,
+          month: 11
+        });       
+      } else {
+        setSelectedDate({ ...selectedDate, month: selectedDate.month - 1});
+      }
+    } else if (elementId === "nextMonth") {
+      if (selectedDate.month === 11) {
+        setSelectedDate({
+          ...selectedDate,
+          year: selectedDate.year + 1,
+          month: 0
+        });        
+      } else {
+        setSelectedDate({ ...selectedDate, month: selectedDate.month + 1});
+      }
+    } else if (elementId === "monthList") {
+      e.stopPropagation();
+      setSelectingState({ ...selectingState, month: true, year: false});
+    }
   };
-  const weeks = splitToWeeks(monthDays);
-  console.log(`Tyzdne: ${weeks}`);
+  const handleYearChange = (e: MouseEvent<HTMLParagraphElement>) => {    
+    setSelectingState({ ...selectingState, year: true, month: false});
+  }
+  const handleSelectDay = (selectedDay: number) => {
+    setSelectedDate({...selectedDate, day: selectedDay });
+    setSelectingState({date: false}); 
+    const date = `${selectedDate.day}.${selectedDate.month+1}.${selectedDate.year}`; 
+    handleDateInputValue(date);
+    handleSetDate(date);
+  }
+  
   useEffect(() => {
-    const dayInMonth = dayjs().year(selectedYear).month(selectedMonth).daysInMonth()
-    setMonthDays(Array.from({length: dayInMonth}, (_, i) => i+1));
-    
-    
-  }, [selectedYear, selectedMonth])
+    const firstDayOfMonth = dayjs().year(selectedDate.year).month(selectedDate.month).startOf("month").day();  
+    const dayInMonth = dayjs().year(selectedDate.year).month(selectedDate.month).daysInMonth();    
+    const emptyDays = Array(firstDayOfMonth).fill(null);
+    const daysArray = [...emptyDays, ...Array.from({ length: dayInMonth }, (_, i) => i + 1)];     
+    setDateInfo({
+      ...dateInfo, 
+      monthName: dayjs().tz("Europe/Bratislava").month(selectedDate.month).format("MMMM"),
+      totalDays: daysArray,
+      weeks: splitToWeeks(daysArray)
+    })
+      
+
+    /* const handleCalendarHide = (e: Event) => {
+      if(calendar.current && !calendar.current.contains(e.target as Node)) {
+        setSelectingState({date: false});
+      }
+    };
+
+    document.addEventListener("mousedown", handleCalendarHide);
+    return () => {
+      document.addEventListener("mousedown", handleCalendarHide);
+    }; */
+  },[selectedDate])
   
   return (   
-    <div className="relative z-0 w-full mb-5 group">
-      <input        
+    <div className="relative z-0 w-full mb-5 group capitalize">
+      <input       
+        ref = { dateInput }
+        onClick={() => setSelectingState({date: true})}
+        value={ dateValue }
         type="text"
         name="birth"
         id="floating_birth"
@@ -64,60 +137,96 @@ const DateElement: React.FC<Props> = (props) => {
         </svg>
         <p className="pl-2">{ elementLabel }</p>
       </label>
-      <div className="relative z-10 w-full my-5 bg-transparent border-2 rounded-lg border-gray-500 group">
-        <div className="flex flex-row">
-          <div>
-            <img src={arrow}/>
+      { selectingState?.date && (
+        <div className="relative z-10 w-full my-5 bg-transparent border-2 rounded-lg border-gray-500 group">       
+          {/** Month select */}
+          { selectingState.month && (
+            <MonthPicker 
+              closeUI={() => setSelectingState({ ...selectingState, month: false})}
+              changeMonth={(monthIndex: number) => setSelectedDate({...selectedDate, month: monthIndex})}
+            />
+          )}        
+          { selectingState.year && (
+            <YearPicker               
+              actualYear={selectedDate.year}
+              closeUI={() => setSelectingState({ ...selectingState, year: false})}
+              changeYear={(year: number) => setSelectedDate({ ...selectedDate, year: year})}
+            />
+          )}
+          {/**Calendar */}
+          <div className="flex flex-row justify-center items-center text-[#F7F9FB] capitalize bg-[#328CC1] rounded-t-md">
+            <div 
+              id="previousMonth"              
+              onClick={handleMonthChange}
+              className="w-10 h-10 hover:text-[#D9B310] hover:font-bold">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 12H20M4 12L8 8M4 12L8 16" stroke="currentcolor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <div className="flex mx-15 text-xl font-bold gap-2">
+              <p
+                id="monthList"
+                className="hover:text-[#D9B310]"
+                onClick={handleMonthChange}
+              >{dateInfo?.monthName}</p>
+              <p
+                className="hover:text-[#D9B310]"
+                onClick={handleYearChange}
+              >{selectedDate.year}</p>
+            </div>
+            <div 
+              id="nextMonth"
+              ref={calendar} 
+              onClick={handleMonthChange}
+              className="rotate-180 w-10 h-10 hover:text-[#D9B310] hover:font-bold">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 12H20M4 12L8 8M4 12L8 16" stroke="currentcolor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
           </div>
-          <div>
-            <p>Februar 2025</p>
-          </div>
-          <div>
-          <img src={arrow} className="rotate-180"/>
-          </div>
-        </div>
-        <table className="w-full">
-          <thead>
-            <tr className="grid grid-cols-7 py-2 text-[#F7F9FB] capitalize bg-[#328CC1] ">
-              <th>po</th>
-              <th>ut</th>
-              <th>str</th>
-              <th>štr</th>
-              <th>pi</th>
-              <th>so</th>
-              <th>ne</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(weeks) ? (
-              weeks.map((week, weekIndex) => (
-                <tr key={weekIndex} className="grid grid-cols-7">
-                  {week.map((day, dayIndex) => (
-                    <td
-                    key={dayIndex}
-                    className="relative flex justify-center items-center text-[#F7F9FB] text-lg hover:text-black aspect-square"
-                  >
-                    <span className="absolute inset-0 flex justify-center items-center hover:bg-[#D9B310] hover:rounded-lg">{day}</span>
-                  </td>
-                  
-                  ))}
-                  {week.length < 7 && 
-                    Array.from({length: 7 - week.length}).map((_, emptyIndex) => (
-                      <td key={emptyIndex}></td>
-                    ))
-                  }
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7}>
-                  Ta neni datum
-                </td>
+          <table className="w-full">
+            <thead>
+              <tr className="grid grid-cols-7 py-2 text-[#F7F9FB] capitalize bg-[#328CC1] ">
+                <th>po</th>
+                <th>ut</th>
+                <th>str</th>
+                <th>štr</th>
+                <th>pi</th>
+                <th>so</th>
+                <th>ne</th>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>         
+
+
+            {/**Continue day picker */}
+            <tbody>
+              {Array.isArray(dateInfo?.weeks) ? (
+                dateInfo?.weeks.map((week, weekIndex) => (
+                  <tr key={weekIndex} className="grid grid-cols-7">
+                    {week.map((day, dayIndex) => (
+                      <td
+                        key={dayIndex}
+                        className="relative flex justify-center items-center text-[#F7F9FB] text-lg hover:text-black aspect-square"
+                        onClick={() => {                          
+                          handleSelectDay(day);
+                        }}
+                      >
+                        {day !== null ? (
+                          <span className="absolute inset-0 flex justify-center items-center hover:bg-[#D9B310] hover:rounded-lg hover:font-bold">{day}</span>
+                        ) : null}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7}>Ta neni datum</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}      
     </div>
   );
 }

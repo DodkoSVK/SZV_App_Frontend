@@ -2,3 +2,6 @@
 * {
   @apply outline-none;
 }
+.yearpicker:hover .yearpicker-icon {
+  transform: rotate(90deg);
+}

@@ -2,10 +2,6 @@ export interface FormUI {
     state: boolean
     formTitle?: string
 }
-
-
-
-
 export interface Button {
     buttonName: string
     buttonText: string

@@ -1,8 +1,11 @@
-import { useEffect, useRef, MouseEvent } from "react";
+import { useEffect, MouseEvent, ChangeEvent, FormEvent, useState } from "react";
 //Types
-import { Person } from "../../assets/types/personTypes";
+import { Person, defaultPerson } from "../../assets/types/personTypes";
 //Childerns
+import InputElement from "../forms/InputElement";
 import DateElement from "../forms/DateElement";
+import GreenButton from "../buttons/GreenButton";
+
 
 interface Props {
     formTitle?: string;
@@ -11,24 +14,34 @@ interface Props {
 }
 
 const PersonForm: React.FC<Props> = (props) => {
-    const fnameInput = useRef<HTMLInputElement>(null);
-    const sNameInput = useRef<HTMLInputElement>(null);
+    const [creatingPerson, setCreatingPerson] = useState<Person>(defaultPerson);
 
-    const { personData } = props;
+    const { formTitle, personData, handleCloseUI } = props;
+    //New
+    const handleInputsChange = (e: ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+        if (e.target.id === "fname")
+            setCreatingPerson({...creatingPerson, fname:e.target.value})
+        else if (e.target.id === "sname")
+            setCreatingPerson({...creatingPerson, sname:e.target.value})
+        console.log(`Data mi poslal element: ${e.target.id}`);
+    }
 
-    const handleClubFormSubmit = async () => {
-        console.log(`Posielam formulat`);
+
+
+
+    //OLD
+    const handleClubFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log(`Posielam formular s udajmi ${JSON.stringify(creatingPerson)}`);
     }
     const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();        
         console.log("Ruším vytvorenie klubu");
         props.handleCloseUI();
     };
-    useEffect(() => {
-        if(personData && personData.id > 0) {
-            if(fnameInput.current) fnameInput.current.value = personData.fname;
-            if(sNameInput.current) sNameInput.current.value = personData.sname;
-        }
+    
+    useEffect(() => {       
 
         const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
@@ -47,42 +60,31 @@ const PersonForm: React.FC<Props> = (props) => {
                 <div className="w-full bg-[#0B3C5D] rounded-lg shadow border border-gray-500 md:mt-0 sm:max-w-md xl:p-0">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-[#F7F9FB] md:text-2xl">
-                            {props.formTitle}
+                            {formTitle}
                         </h1>
                         <form className="space-y-4 md:space-y-6" onSubmit={handleClubFormSubmit}>
-                            <div className="relative z-0 w-full mb-5 group">
-                                <input
-                                    ref={fnameInput}
-                                    type="text"
-                                    name="fname"
-                                    id="floating_fname"
-                                    className="block py-2.5 px-0 w-full text-sm text-[#F7F9FB] bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#D9B310] peer"
-                                    placeholder=" "
-                                    required
-                                />
-                                <label
-                                    htmlFor="floating_fname"
-                                    className="peer-focus:font-medium absolute text-sm text-[#F7F9FB] duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[#D9B310] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                                >Meno</label>
-                            </div>
-                            <div className="relative z-0 w-full mb-5 group">
-                                <input
-                                    ref={sNameInput}
-                                    type="text"
-                                    name="sname"
-                                    id="floating_sname"
-                                    className="block py-2.5 px-0 w-full text-sm text-[#F7F9FB] bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#D9B310] peer"
-                                    placeholder=" "
-                                    required
-                                />
-                                <label
-                                    htmlFor="floating_sname"
-                                    className="peer-focus:font-medium absolute text-sm text-[#F7F9FB] duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[#D9B310] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                                >Priezvisko</label>
-                            </div>
+                            <InputElement 
+                                inputValue= {personData?.fname || ""}
+                                inputLabel="meno"
+                                inputName= "fname"
+                                handleOnChange={handleInputsChange}
+                            />
+                            <InputElement
+                                inputValue={personData?.sname || ""}
+                                inputLabel="priezvisko"
+                                inputName= "sname"
+                                handleOnChange={handleInputsChange}
+                            />                            
                             <DateElement 
-                                elementLabel="Dátum narodenia"
-                            />                                                  
+                                dateValue= {personData?.birth || ""}
+                                elementLabel="dátum narodenia"                               
+                                handleSetDate={(date: string) => setCreatingPerson({ ...creatingPerson, birth: date})}
+                            /> 
+                            <GreenButton                                     
+                                    buttonType="submit"
+                                    buttonName={"create"}
+                                    buttonText={"create"}                             
+                                />                                                       
                             {/*
                             {clubData.id > 0 && (
                                 <SelectElement   
