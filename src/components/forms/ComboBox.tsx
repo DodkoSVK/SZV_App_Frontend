@@ -3,6 +3,8 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { useState } from 'react'
 import { PersonSelect } from '../../assets/types/personTypes'
 
+
+
 interface Props {
   people: PersonSelect[];
   onSelectChange: (id: number) => void; // Pridanie funkcie na vrátenie ID rodičovi

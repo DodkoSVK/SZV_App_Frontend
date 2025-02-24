@@ -258,7 +258,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
                             </div>
                             <ComboBox 
                                 people={Array.isArray(persons) ? persons : []}
-                                onSelectChange={(id:number) => handleSelectChange(id)}
+                                onSelectChange={(id:number) => handleSelectChange(id)} 
                             />                            
                             <div className="flex flex-row space-x-4 justify-center">
                                 <GreenButton                                     

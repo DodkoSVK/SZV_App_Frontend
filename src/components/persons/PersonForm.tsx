@@ -1,10 +1,13 @@
 import { useEffect, MouseEvent, ChangeEvent, FormEvent, useState } from "react";
 //Types
 import { Person, defaultPerson } from "../../assets/types/personTypes";
+import { Club } from "../../assets/types/clubTypes";
+import { getClubs } from "../../apis/ClubApis";
 //Childerns
 import InputElement from "../forms/InputElement";
 import DateElement from "../forms/DateElement";
 import GreenButton from "../buttons/GreenButton";
+import ComboBoxPerson from "../forms/ComboBoxPersonForm";
 
 
 interface Props {
@@ -15,18 +18,30 @@ interface Props {
 
 const PersonForm: React.FC<Props> = (props) => {
     const [creatingPerson, setCreatingPerson] = useState<Person>(defaultPerson);
+    const [clubs, setClubs] = useState<Club[] | { message: string }>([]);
 
     const { formTitle, personData, handleCloseUI } = props;
     //New
+    const fetchClubs = async () => {
+        const response = await getClubs();
+        if(Array.isArray(response)) {
+            setClubs(response);
+        } else {
+            setClubs({ message: response.message})
+        }
+        
+    }
     const handleInputsChange = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         if (e.target.id === "fname")
             setCreatingPerson({...creatingPerson, fname:e.target.value})
         else if (e.target.id === "sname")
-            setCreatingPerson({...creatingPerson, sname:e.target.value})
-        console.log(`Data mi poslal element: ${e.target.id}`);
+            setCreatingPerson({...creatingPerson, sname:e.target.value})     
+    };
+    const handleClubSelect = (clubID: number) => {
+        console.log(`ID klubu: ${clubID}`)
+        //setCreatingPerson({...creatingPerson, club: clubID})
     }
-
 
 
 
@@ -41,7 +56,12 @@ const PersonForm: React.FC<Props> = (props) => {
         props.handleCloseUI();
     };
     
-    useEffect(() => {       
+    useEffect(() => {  
+        fetchClubs();     
+        if(personData)
+            setCreatingPerson(personData)
+        else
+            setCreatingPerson(defaultPerson)
 
         const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
@@ -52,7 +72,7 @@ const PersonForm: React.FC<Props> = (props) => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    })
+    }, [personData]);
 
     return (
         <section>
@@ -64,27 +84,31 @@ const PersonForm: React.FC<Props> = (props) => {
                         </h1>
                         <form className="space-y-4 md:space-y-6" onSubmit={handleClubFormSubmit}>
                             <InputElement 
-                                inputValue= {personData?.fname || ""}
+                                inputValue= {creatingPerson.fname}
                                 inputLabel="meno"
                                 inputName= "fname"
                                 handleOnChange={handleInputsChange}
                             />
                             <InputElement
-                                inputValue={personData?.sname || ""}
+                                inputValue={creatingPerson.sname}
                                 inputLabel="priezvisko"
                                 inputName= "sname"
                                 handleOnChange={handleInputsChange}
                             />                            
                             <DateElement 
-                                dateValue= {personData?.birth || ""}
+                                dateValue= {creatingPerson.birth}
                                 elementLabel="dátum narodenia"                               
                                 handleSetDate={(date: string) => setCreatingPerson({ ...creatingPerson, birth: date})}
                             /> 
+                            <ComboBoxPerson 
+                                clubs={clubs}
+                                onSelectChange={handleClubSelect}
+                            />
                             <GreenButton                                     
-                                    buttonType="submit"
-                                    buttonName={"create"}
-                                    buttonText={"create"}                             
-                                />                                                       
+                                buttonType="submit"
+                                buttonName={"create"}
+                                buttonText={"create"}                             
+                            />                                                       
                             {/*
                             {clubData.id > 0 && (
                                 <SelectElement   

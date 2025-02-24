@@ -115,6 +115,7 @@ const DateElement: React.FC<Props> = (props) => {
         ref = { dateInput }
         onClick={() => setSelectingState({date: true})}
         value={ dateValue }
+        onChange={(e) => handleSetDate(e.target.value)}
         type="text"
         name="birth"
         id="floating_birth"

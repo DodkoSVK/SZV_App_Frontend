@@ -1,5 +1,4 @@
 import { ChangeEvent } from "react";
-import { debounce } from "lodash-es";
 
 interface Props {
     inputValue: string
@@ -14,7 +13,7 @@ const InputElement: React.FC<Props> = (props) => {
     return (
         <div className="relative z-0 w-full mb-5 group capitalize">
             <input                
-                onChange={debounce(handleOnChange, 500)}
+                onChange={handleOnChange}
                 type="text"
                 name={inputName}
                 id={inputName}
