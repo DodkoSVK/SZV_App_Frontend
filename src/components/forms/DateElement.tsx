@@ -79,7 +79,7 @@ const DateElement: React.FC<Props> = (props) => {
   const handleSelectDay = (selectedDay: number) => {
     setSelectedDate({...selectedDate, day: selectedDay });
     setSelectingState({date: false}); 
-    const date = `${selectedDate.day}.${selectedDate.month+1}.${selectedDate.year}`; 
+    const date = `${selectedDate.year}.${selectedDate.month+1}.${selectedDate.day}`; 
     handleDateInputValue(date);
     handleSetDate(date);
   }

@@ -9,7 +9,7 @@ interface Props {
 const YearPicker: React.FC<Props> = ({ actualYear, closeUI, changeYear }) => {
   const [isOpen, setIsOpen] = useState(false);
  
-  const startYear = 1950;
+  const startYear = 1940;
   const endYear = new Date().getFullYear() + 5;
   const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i).reverse(); // Najnovšie roky hore
 

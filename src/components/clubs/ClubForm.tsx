@@ -125,7 +125,7 @@ const ClubCreateForm: React.FC<Props> = (props) => {
         setGreenButton({
             buttonName: clubData && clubData.id ? "update" : "create",
             buttonText: clubData && clubData.id ? "upraviť" : "vytvoriť"                
-        })
+        });
         fetchPersons();
 
         const handleKeyDown = (event: KeyboardEvent) => {

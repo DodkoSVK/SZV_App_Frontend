@@ -1,26 +1,31 @@
 import { useEffect, MouseEvent, ChangeEvent, FormEvent, useState } from "react";
 //Types
-import { Person, defaultPerson } from "../../assets/types/personTypes";
+import { Person, defaultPerson, CreatePerson } from "../../assets/types/personTypes";
 import { Club } from "../../assets/types/clubTypes";
 import { getClubs } from "../../apis/ClubApis";
+import { Button } from "../../assets/types";
 //Childerns
 import InputElement from "../forms/InputElement";
 import DateElement from "../forms/DateElement";
 import GreenButton from "../buttons/GreenButton";
+import YellowButton from "../buttons/OrangeButton";
+import RedButton from "../buttons/RedButton";
 import ComboBoxPerson from "../forms/ComboBoxPersonForm";
 
 
 interface Props {
     formTitle?: string;
     personData?: Person;
-    handleCloseUI: () => void;
+    handleCloseUI: (e: MouseEvent<HTMLButtonElement>) => void;
+    handleCreatePerson: (person: CreatePerson) => void;
 }
 
 const PersonForm: React.FC<Props> = (props) => {
+    const [greenButton, setGreenButton] = useState<Button>();
     const [creatingPerson, setCreatingPerson] = useState<Person>(defaultPerson);
     const [clubs, setClubs] = useState<Club[] | { message: string }>([]);
 
-    const { formTitle, personData, handleCloseUI } = props;
+    const { formTitle, personData, handleCloseUI, handleCreatePerson } = props;
     //New
     const fetchClubs = async () => {
         const response = await getClubs();
@@ -40,7 +45,7 @@ const PersonForm: React.FC<Props> = (props) => {
     };
     const handleClubSelect = (clubID: number) => {
         console.log(`ID klubu: ${clubID}`)
-        //setCreatingPerson({...creatingPerson, club: clubID})
+        setCreatingPerson({...creatingPerson, club_id: clubID})
     }
 
 
@@ -48,25 +53,36 @@ const PersonForm: React.FC<Props> = (props) => {
     //OLD
     const handleClubFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const formButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+        if(formButton.name === "create") {
+            const createPersonData: CreatePerson = {
+                fname: creatingPerson?.fname || "",
+                sname: creatingPerson?.sname || "",
+                birth: creatingPerson?.birth || "",
+                ...(creatingPerson?.club_id ? { club: creatingPerson.club_id } : {})
+            }
+            handleCreatePerson(createPersonData);
+        }
         console.log(`Posielam formular s udajmi ${JSON.stringify(creatingPerson)}`);
     }
-    const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();        
-        console.log("Ruším vytvorenie klubu");
-        props.handleCloseUI();
-    };
+    
     
     useEffect(() => {  
+        setGreenButton({
+            buttonName: personData && personData.id ? "update" : "create",
+            buttonText: personData && personData.id ? "upraviť" : "vytvoriť"                
+        })
         fetchClubs();     
+
         if(personData)
             setCreatingPerson(personData)
         else
             setCreatingPerson(defaultPerson)
 
         const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-            handleCancelButton(event as unknown as MouseEvent<HTMLButtonElement>);
-        }
+            if (event.key === 'Escape') {
+                handleCloseUI(event as unknown as MouseEvent<HTMLButtonElement>);
+            }
         };
         document.addEventListener('keydown', handleKeyDown);
         return () => {
@@ -104,40 +120,26 @@ const PersonForm: React.FC<Props> = (props) => {
                                 clubs={clubs}
                                 onSelectChange={handleClubSelect}
                             />
-                            <GreenButton                                     
-                                buttonType="submit"
-                                buttonName={"create"}
-                                buttonText={"create"}                             
-                            />                                                       
-                            {/*
-                            {clubData.id > 0 && (
-                                <SelectElement   
-                                    selectOptions={personWithoutClub}                                  
-                                    selectLabel="Štatutár klubu"
-                                    selectedItem={handleSelectChange}
-                                />   
-                            )}
                             <div className="flex flex-row space-x-4 justify-center">
-                                <GreenButton                                     
+                                <GreenButton 
                                     buttonType="submit"
                                     buttonName={greenButton?.buttonName || ""}
-                                    buttonText={greenButton?.buttonText || ""}                             
-                                />                         
+                                    buttonText={greenButton?.buttonText || ""}
+                                />
                                 <YellowButton 
                                     buttonType="button"
                                     buttonName="cancel"
-                                    buttonText="zrušiť"    
-                                    clickAction={handleCancelButton} 
+                                    buttonText="zrušiť"
+                                    clickAction={handleCloseUI}
                                 />
-                                {clubData.id > 0 && (
+                                { personData && personData.id > 0 && (
                                     <RedButton 
                                         buttonType="submit"
                                         buttonName="delete"
-                                        buttonText="vymazať"  
+                                        buttonText="vymazať"
                                     />
-                                )}                                 
-                            </div>
-                            */}
+                                )}
+                            </div>                                                     
                         </form>
                     </div>
                 </div>

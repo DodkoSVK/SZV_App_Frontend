@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CreatePerson } from "../assets/types/personTypes";
 
 export const getPersons = async () => {
     console.log(`🟡 Načítavam všetky osoby`);
@@ -51,3 +52,15 @@ export const getSortedPersons = async (key: string) => {
         return { message: "Chyba pri získavaní osôb" }; 
     })
 };
+export const createPerson = async (person: CreatePerson) => {
+    console.log("🟡 Vytváram osobu s týmito údajmi: ", person);
+    return axios.post('https://app.vzpieranie.sk:3002/api/person', person).then(async response => {
+        const code = response.status;
+        if (code >= 200 && code < 300) return 1; 
+    }).catch(error => {
+        const code = error.status;            
+        console.log(`🔴 Chyba pri vytváraní osoby: ${code}`);
+        if(code >= 400 && code < 500) return 2;                      
+        if(code >= 500) return 3;  
+    });
+}

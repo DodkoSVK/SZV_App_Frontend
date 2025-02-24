@@ -9,6 +9,7 @@ export interface Person {
     fname: string,
     sname: string,
     birth: string,
+    club_id?: number,
     club?: string
 }
 export const defaultPerson: Person = {
@@ -16,5 +17,12 @@ export const defaultPerson: Person = {
     fname: "",
     sname: "",
     birth: "",
+    club_id: 0,
     club: "",    
 };
+export interface CreatePerson {
+    fname: string,
+    sname: string,
+    birth: string,
+    club?: number
+}
