@@ -6,7 +6,7 @@ import plusIcon from '../../assets/plus.svg';
 interface Props {
     persons: Person[] | { message: string };
     sortBy: (key: string) => void;
-    uiHandler: (personId: number ) => void
+    formUiData: (personId: number ) => void
 }
 
 const PersonsTable: React.FC<Props> = (props) => {
@@ -15,18 +15,18 @@ const PersonsTable: React.FC<Props> = (props) => {
     const sortByDoB = useRef<HTMLButtonElement>(null);
     const sortByClub = useRef<HTMLButtonElement>(null);
 
-    const { persons } = props;
+    const { persons, sortBy, formUiData } = props;
     const handleSort = (e: MouseEvent<HTMLButtonElement>) => {
         const buttonName = e.currentTarget.name;
-        props.sortBy(buttonName);
+        sortBy(buttonName);
     }
     const handleEdit = (id: number) => {
-        console.log(`Editujem osobu s id: ${id}`);
-        props.uiHandler(id);
+        //console.log(`Editujem osobu s id: ${id}`);
+        formUiData(id);
     }
     const handleAdd = () => {
         //console.log('Pridávam novú osobu.');
-        props.uiHandler(0);
+        formUiData(0);
     }
 
     return (
@@ -123,7 +123,7 @@ const PersonsTable: React.FC<Props> = (props) => {
                     ) : (
                         <tr>
                             <td colSpan={4} className="px-6 py-4 text-center text-white font-bold text-2xl">
-                                {persons.message}
+                                {persons?.message}
                             </td>
                         </tr>
                     )}

@@ -1,6 +1,6 @@
-import { useEffect, MouseEvent, ChangeEvent, FormEvent, useState } from "react";
+import { useEffect, ChangeEvent, FormEvent, useState } from "react";
 //Types
-import { Person, defaultPerson, CreatePerson } from "../../assets/types/personTypes";
+import { Person, defaultPerson} from "../../assets/types/personTypes";
 import { Club } from "../../assets/types/clubTypes";
 import { getClubs } from "../../apis/ClubApis";
 import { Button } from "../../assets/types";
@@ -16,16 +16,18 @@ import ComboBoxPerson from "../forms/ComboBoxPersonForm";
 interface Props {
     formTitle?: string;
     personData?: Person;
-    handleCloseUI: (e: MouseEvent<HTMLButtonElement>) => void;
-    handleCreatePerson: (person: CreatePerson) => void;
+    closeUI: () => void;
+    createPerson: (person: Person) => void;
+    updatePerson: (person: Person) => void;
+    deletePerson: (person: Person) => void;
 }
 
 const PersonForm: React.FC<Props> = (props) => {
     const [greenButton, setGreenButton] = useState<Button>();
-    const [creatingPerson, setCreatingPerson] = useState<Person>(defaultPerson);
+    const [person, setPerson] = useState<Person>(defaultPerson);
     const [clubs, setClubs] = useState<Club[] | { message: string }>([]);
 
-    const { formTitle, personData, handleCloseUI, handleCreatePerson } = props;
+    const { formTitle, personData, closeUI, createPerson, updatePerson } = props;
     //New
     const fetchClubs = async () => {
         const response = await getClubs();
@@ -33,61 +35,52 @@ const PersonForm: React.FC<Props> = (props) => {
             setClubs(response);
         } else {
             setClubs({ message: response.message})
-        }
-        
-    }
+        }        
+    };
     const handleInputsChange = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         if (e.target.id === "fname")
-            setCreatingPerson({...creatingPerson, fname:e.target.value})
+            setPerson({...person, fname:e.target.value})
         else if (e.target.id === "sname")
-            setCreatingPerson({...creatingPerson, sname:e.target.value})     
+            setPerson({...person, sname:e.target.value})     
     };
     const handleClubSelect = (clubID: number) => {
         console.log(`ID klubu: ${clubID}`)
-        setCreatingPerson({...creatingPerson, club_id: clubID})
-    }
-
-
-
-    //OLD
-    const handleClubFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        setPerson({...person, club_id: clubID})
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') 
+            closeUI();            
+    };
+    const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
-        if(formButton.name === "create") {
-            const createPersonData: CreatePerson = {
-                fname: creatingPerson?.fname || "",
-                sname: creatingPerson?.sname || "",
-                birth: creatingPerson?.birth || "",
-                ...(creatingPerson?.club_id ? { club: creatingPerson.club_id } : {})
-            }
-            handleCreatePerson(createPersonData);
-        }
-        console.log(`Posielam formular s udajmi ${JSON.stringify(creatingPerson)}`);
+        if(formButton.name === "create")
+            createPerson(person);
+        else if (formButton.name === "update")
+            updatePerson(person);
     }
+
     
     
-    useEffect(() => {  
+
+    //Only once
+    useEffect(() => {
         setGreenButton({
-            buttonName: personData && personData.id ? "update" : "create",
-            buttonText: personData && personData.id ? "upraviť" : "vytvoriť"                
-        })
-        fetchClubs();     
-
-        if(personData)
-            setCreatingPerson(personData)
-        else
-            setCreatingPerson(defaultPerson)
-
-        const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                handleCloseUI(event as unknown as MouseEvent<HTMLButtonElement>);
-            }
-        };
+            buttonName: personData && personData.id > 0 ? "update" : "create",
+            buttonText: personData && personData.id > 0 ? "upraviť" : "vytvoriť"                
+        });
+        fetchClubs();          
         document.addEventListener('keydown', handleKeyDown);
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
+    },[]);
+    //After person edited
+    useEffect(() => {  
+        if(personData)
+            setPerson(personData)
+        
     }, [personData]);
 
     return (
@@ -98,23 +91,23 @@ const PersonForm: React.FC<Props> = (props) => {
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-[#F7F9FB] md:text-2xl">
                             {formTitle}
                         </h1>
-                        <form className="space-y-4 md:space-y-6" onSubmit={handleClubFormSubmit}>
+                        <form className="space-y-4 md:space-y-6" onSubmit={handleFormSubmit}>
                             <InputElement 
-                                inputValue= {creatingPerson.fname}
+                                inputValue= {person.fname}
                                 inputLabel="meno"
                                 inputName= "fname"
                                 handleOnChange={handleInputsChange}
                             />
                             <InputElement
-                                inputValue={creatingPerson.sname}
+                                inputValue={person.sname}
                                 inputLabel="priezvisko"
                                 inputName= "sname"
                                 handleOnChange={handleInputsChange}
                             />                            
                             <DateElement 
-                                dateValue= {creatingPerson.birth}
+                                dateValue= {person.birth}
                                 elementLabel="dátum narodenia"                               
-                                handleSetDate={(date: string) => setCreatingPerson({ ...creatingPerson, birth: date})}
+                                handleSetDate={(date: string) => setPerson({ ...person, birth: date })}
                             /> 
                             <ComboBoxPerson 
                                 clubs={clubs}
@@ -130,7 +123,7 @@ const PersonForm: React.FC<Props> = (props) => {
                                     buttonType="button"
                                     buttonName="cancel"
                                     buttonText="zrušiť"
-                                    clickAction={handleCloseUI}
+                                    clickAction={closeUI}
                                 />
                                 { personData && personData.id > 0 && (
                                     <RedButton 

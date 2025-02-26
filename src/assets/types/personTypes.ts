@@ -20,9 +20,3 @@ export const defaultPerson: Person = {
     club_id: 0,
     club: "",    
 };
-export interface CreatePerson {
-    fname: string,
-    sname: string,
-    birth: string,
-    club?: number
-}
