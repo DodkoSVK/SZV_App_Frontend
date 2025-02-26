@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getPersons, getSortedPersons, createPerson } from "../../apis/PersonApis";
+import { getPersons, getSortedPersons, createPerson, updatePerson} from "../../apis/PersonApis";
 //Types
-import { Person } from "../../assets/types/personTypes";
+import { Person, CreatePerson, EditPerson } from "../../assets/types/personTypes";
 //Children Components
 import PersonsTable from "../persons/PersonsTable";
 import PersonForm from "../persons/PersonForm";
@@ -10,7 +10,7 @@ import SuccessAlert from "../alerts/SuccessAlert";
 import FailedAlert from "../alerts/FailedAlert";
 //Component
 const ThePersons: React.FC = () => {
-    const [persons, setPersons] = useState<Person[] | {message: string}>();
+    const [persons, setPersons] = useState<Person[] | {message: string}>({ message: ""});
     const [processPerson, setProcessPerson] = useState<Person>();
     const [formUiData, setFormUiData] = useState<FormUI>();
     const [alert, setAlert] = useState<Alert>();
@@ -18,31 +18,65 @@ const ThePersons: React.FC = () => {
     //Persons handlers
     const handleFetchAllPeoples = async () => {
         const results = await getPersons();
-        console.log(`Results: ${JSON.stringify(results)}`);
-        if (Array.isArray(results)) {
+        console.log(results)
+        if (Array.isArray(results)) 
             setPersons(results);
-            console.log(`Ludia: ${JSON.stringify(results)}`);
-        } else {
-            setPersons({message: results.message});
-            console.log(`Ludia: ${JSON.stringify({message: results.message})}`);
-        }
+        else 
+            setPersons({message: results.message});          
     };
     const handleFetchSortedPersons = async (key: string) => {
-        setPersons(await getSortedPersons(key));
+        const results = await getSortedPersons(key);
+        if (Array.isArray(results)) 
+            setPersons(results);            
+        else 
+            setPersons({message: results.message});           
     };
     const handleSearchPersonById = (idPerson: number) => {
         if (Array.isArray(persons))
             setProcessPerson(persons.find(person => person.id === idPerson))
     };
-    const handleCreatePerson = (person: Person) => {
-        console.log(`Ta vyvaram personu: ${JSON.stringify(person)}`);
-        setAlert({ alertType: true, alertMessage: "Osoba vytvorená"});
-        handleCloseFormUI();
+    const handleCreatePerson = async (person: Person) => {
+        const creatingPerson: CreatePerson = {
+            fname: person.fname,
+            sname: person.sname,
+            birth: person.birth,
+            ...(person.club_id !== 0 && { club: person.club_id })
+        };
+        console.log(`Ta vyvaram personu: ${JSON.stringify(creatingPerson)}`);
+        const createStatus = await createPerson(creatingPerson);
+        if (createStatus === 1) {
+            setAlert({ alertType: true, alertMessage: "Osoba vytvorená"});
+            handleCloseFormUI();
+        }          
+        else if (createStatus === 2 ){
+            setAlert({ alertType: false, alertMessage: "Nepodarilo sa vytvoriť osobu"}); 
+        }             
+        else if (createStatus === 3){
+            setAlert({ alertType: false, alertMessage: "Nepodarilo sa vytvoriť osobu. Chyba na strane servera"}); 
+        }            
     }
-    const handleUpdatePerson = (person: Person) => {
-        console.log(`Ta vyvaram personu: ${JSON.stringify(person)}`);
-        setAlert({ alertType: false, alertMessage: "Osoba upravená"});
-        handleCloseFormUI();
+    const handleUpdatePerson = async (person: Person) => {        
+        const editingPerson: EditPerson = {
+            fname: person?.fname,
+            sname: person?.sname,
+            birth: person?.birth           
+        }
+        if(person.club_id && person.club_id > 0)
+            editingPerson.club = person.club_id;
+
+        console.log(`Ta upravujem personu: ${JSON.stringify(editingPerson)}`);
+
+        const editStatus = await updatePerson(person.id,editingPerson);
+        if (editStatus === 1) {
+            setAlert({ alertType: true, alertMessage: "Osoba vytvorená"});
+            handleCloseFormUI();
+        }          
+        else if (editStatus === 2 ){
+            setAlert({ alertType: false, alertMessage: "Nepodarilo sa vytvoriť osobu"}); 
+        }             
+        else if (editStatus === 3){
+            setAlert({ alertType: false, alertMessage: "Nepodarilo sa vytvoriť osobu. Chyba na strane servera"}); 
+        }  
     }
     const handleDeletePerson = (person: Person) => {
         console.log(`Ta vyvaram personu: ${JSON.stringify(person)}`);
@@ -64,8 +98,7 @@ const ThePersons: React.FC = () => {
     };
     const handleCloseAlert = () => {
         setAlert(undefined);
-    }
-
+    }    
     useEffect(() => {
         handleFetchAllPeoples();
     },[])

@@ -73,7 +73,7 @@ const DateElement: React.FC<Props> = (props) => {
       setSelectingState({ ...selectingState, month: true, year: false});
     }
   };
-  const handleYearChange = (e: MouseEvent<HTMLParagraphElement>) => {    
+  const handleYearChange = () => {    
     setSelectingState({ ...selectingState, year: true, month: false});
   }
   const handleSelectDay = (selectedDay: number) => {

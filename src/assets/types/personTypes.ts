@@ -1,9 +1,3 @@
-export interface PersonSelect {
-    id: number,
-    fname: string,
-    sname: string,
-    club: string
-}
 export interface Person {
     id: number,
     fname: string,
@@ -20,3 +14,21 @@ export const defaultPerson: Person = {
     club_id: 0,
     club: "",    
 };
+export interface PersonSelect {
+    id: number,
+    fname: string,
+    sname: string,
+    club: string
+}
+export interface CreatePerson {
+    fname: string,
+    sname: string,
+    birth: string,
+    club?: number
+}
+export interface EditPerson {
+    fname?: string,
+    sname?: string,
+    birth?: string,
+    club?: number
+}

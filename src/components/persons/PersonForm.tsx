@@ -61,9 +61,6 @@ const PersonForm: React.FC<Props> = (props) => {
             updatePerson(person);
     }
 
-    
-    
-
     //Only once
     useEffect(() => {
         setGreenButton({

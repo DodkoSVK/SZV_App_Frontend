@@ -5,7 +5,7 @@ import { Club } from '../../assets/types/clubTypes'
 
 interface Props {
   clubs: Club[] | { message: string };
-  onSelectChange: (id: number | null) => void; // Umožníme null pre prípad, že nie sú kluby
+  onSelectChange: (id: number) => void;
 }
 
 const ComboBoxPerson: React.FC<Props> = ({ clubs, onSelectChange }) => {
@@ -28,7 +28,7 @@ const ComboBoxPerson: React.FC<Props> = ({ clubs, onSelectChange }) => {
       onChange={(club: Club | null) => {
         setQuery('');
         setSelectedClub(club);
-        onSelectChange(club ? club.id : null);
+        onSelectChange(club ? club.id : 0);
       }}
     >
       <Label className="text-sm text-[#F7F9FB]">Športový klub</Label>

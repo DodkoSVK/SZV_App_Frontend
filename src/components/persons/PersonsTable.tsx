@@ -16,6 +16,7 @@ const PersonsTable: React.FC<Props> = (props) => {
     const sortByClub = useRef<HTMLButtonElement>(null);
 
     const { persons, sortBy, formUiData } = props;
+    
     const handleSort = (e: MouseEvent<HTMLButtonElement>) => {
         const buttonName = e.currentTarget.name;
         sortBy(buttonName);
