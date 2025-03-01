@@ -1,8 +1,10 @@
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import isoWeek from "dayjs/plugin/isoWeek";
+
 import 'dayjs/locale/sk';
-import { useEffect, useState,useRef, MouseEvent } from "react";
+import { useEffect, useState,useRef, MouseEvent, ChangeEvent } from "react";
 //Types
 import { SelectingDate, SelectedDate, DateInformation } from "../../assets/types/datePicker";
 //Children
@@ -12,15 +14,150 @@ import YearPicker from "../dateElement/YearPicker";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.locale("sk");
+dayjs.extend(isoWeek);
+
+const getMonthDays = (y: number, m: number) => {
+  const startOfMonth = dayjs(new Date(y, m, 1));
+  const endOfMonth = dayjs(new Date(y, m +1, 0));
+  
+}
 
 interface Props {
-  dateValue: string
+  elementLabel: string
+  elementValue: string
+
+
+  /* dateValue: string
   elementLabel: string 
-  handleSetDate: (date: string) => void;
+  handleSetDate: (date: string) => void; */
 }
 
 const DateElement: React.FC<Props> = (props) => {
-  //useState
+  const [date, setDate] = useState<string>("");
+  const [selectingState, setSelectingState] = useState<SelectingDate>();
+  const [selectedDate, setSelectedDate] = useState<SelectedDate>({
+    year: dayjs().tz("Europe/Bratislava").year(),
+    month: dayjs().tz("Europe/Bratislava").month(),    
+    day: dayjs().tz("Europe/Bratislava").date(),   
+  }); 
+  const [dateInfo, setDateInfo] = useState<DateInformation | null>(null);
+
+  const { elementLabel, elementValue } = props
+
+  //Change input value
+  const handleInputValue = (e: ChangeEvent<HTMLInputElement>) => {
+    setDate(e.target.value);     
+  }
+  const handleDateSelectors = () => {
+    setSelectingState({...selectingState, date: true});
+  }
+
+  const dateInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setDate(elementValue)
+    if (dateInput.current) dateInput.current.value = date;
+  }, [date]);
+  return (
+    <div className="relative z-0 w-full mb-5 group capitalize">
+      <input               
+        ref = { dateInput }
+        onChange={handleInputValue}
+        onClick={handleDateSelectors}
+        type="text"
+        name="birth"
+        id="floating_birth"
+        className="block py-2.5 px-0 w-full text-sm text-[#F7F9FB] bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-[#D9B310] peer"
+        placeholder=" "
+        required
+      />
+      <label
+          htmlFor="floating_birth"
+          className="flex flex-row gap-2 peer-focus:font-medium absolute text-sm text-[#F7F9FB] duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-[#D9B310] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+      >
+        <svg 
+          className="w-4 h-4"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+        >
+          <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+        </svg>
+        { elementLabel }
+      </label>
+
+      { selectingState?.date && (
+        <div className="relative z-10 w-full my-5 bg-transparent group">       
+          
+          { selectingState.month && (
+            <MonthPicker 
+              closeUI={() => setSelectingState({ ...selectingState, month: false})}
+              changeMonth={(monthIndex: number) => setSelectedDate({...selectedDate, month: monthIndex})}
+            />
+          )}        
+          { selectingState.year && (
+            <YearPicker               
+              actualYear={selectedDate.year}
+              closeUI={() => setSelectingState({ ...selectingState, year: false})}
+              changeYear={(year: number) => setSelectedDate({ ...selectedDate, year: year})}
+            />
+          )}
+          
+          <div className="flex flex-row gap-2 mb-2 font-bold text-gray-50">
+            <div className="flex flex-row grow-6 justify-between items-center p-2 rounded-lg  bg-[#328CC1]">
+              <div className="ml-5 transition-transform duration-300 hover:text-[#D9B310] hover:scale-150">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
+                  <path fill-rule="evenodd" d="M14 8a.75.75 0 0 1-.75.75H4.56l1.22 1.22a.75.75 0 1 1-1.06 1.06l-2.5-2.5a.75.75 0 0 1 0-1.06l2.5-2.5a.75.75 0 0 1 1.06 1.06L4.56 7.25h8.69A.75.75 0 0 1 14 8Z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div className="hover:text-[#D9B310]">
+                <p>Mesiac</p>
+              </div>
+              <div className="mr-5 transition-transform duration-300 hover:text-[#D9B310] hover:scale-150">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
+                  <path fill-rule="evenodd" d="M2 8c0 .414.336.75.75.75h8.69l-1.22 1.22a.75.75 0 1 0 1.06 1.06l2.5-2.5a.75.75 0 0 0 0-1.06l-2.5-2.5a.75.75 0 1 0-1.06 1.06l1.22 1.22H2.75A.75.75 0 0 0 2 8Z" clip-rule="evenodd" />
+                </svg>
+              </div>             
+            </div>
+            <div className="flex grow-4 justify-center items-center p-1 rounded-lg bg-[#328CC1] hover:text-[#D9B310]">
+              <p>Rok</p>
+            </div>
+          </div>
+          <table className="w-full">                   
+            <tbody>
+              {Array.isArray(dateInfo?.weeks) ? (
+                dateInfo?.weeks.map((week, weekIndex) => (
+                  <tr key={weekIndex} className="grid grid-cols-7">
+                    {week.map((day, dayIndex) => (
+                      <td
+                        key={dayIndex}
+                        className="relative flex justify-center items-center text-[#F7F9FB] text-lg hover:text-black aspect-square"
+                        /* onClick={() => {                          
+                          handleSelectDay(day);
+                        }} */
+                      >
+                        {day !== null ? (
+                          <span className="absolute inset-0 flex justify-center items-center hover:bg-[#D9B310] hover:rounded-lg hover:font-bold">{day}</span>
+                        ) : null}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7}>Ta neni datum</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+    </div>
+  );
+}
+  /* //useState
   const [selectingState, setSelectingState] = useState<SelectingDate>();
   const [selectedDate, setSelectedDate] = useState<SelectedDate>({
     year: dayjs().tz("Europe/Bratislava").year(),
@@ -106,10 +243,10 @@ const DateElement: React.FC<Props> = (props) => {
     document.addEventListener("mousedown", handleCalendarHide);
     return () => {
       document.addEventListener("mousedown", handleCalendarHide);
-    }; */
+    }; 
   },[selectedDate])
-  
-  return (   
+   */
+  /* return (   
     <div className="relative z-0 w-full mb-5 group capitalize">
       <input       
         ref = { dateInput }
@@ -140,7 +277,7 @@ const DateElement: React.FC<Props> = (props) => {
       </label>
       { selectingState?.date && (
         <div className="relative z-10 w-full my-5 bg-transparent border-2 rounded-lg border-gray-500 group">       
-          {/** Month select */}
+          
           { selectingState.month && (
             <MonthPicker 
               closeUI={() => setSelectingState({ ...selectingState, month: false})}
@@ -154,7 +291,7 @@ const DateElement: React.FC<Props> = (props) => {
               changeYear={(year: number) => setSelectedDate({ ...selectedDate, year: year})}
             />
           )}
-          {/**Calendar */}
+          
           <div className="flex flex-row justify-center items-center text-[#F7F9FB] capitalize bg-[#328CC1] rounded-t-md">
             <div 
               id="previousMonth"              
@@ -199,7 +336,7 @@ const DateElement: React.FC<Props> = (props) => {
             </thead>         
 
 
-            {/**Continue day picker */}
+            
             <tbody>
               {Array.isArray(dateInfo?.weeks) ? (
                 dateInfo?.weeks.map((week, weekIndex) => (
@@ -229,6 +366,6 @@ const DateElement: React.FC<Props> = (props) => {
         </div>
       )}      
     </div>
-  );
-}
+  ); 
+} */
 export default DateElement;
