@@ -104,6 +104,7 @@ const PersonForm: React.FC<Props> = (props) => {
                             <DateElement 
                                 elementLabel="Dátum narodenia"
                                 elementValue= {personData && personData.id > 0 ? personData?.birth : ""}
+                                setPersonBirth={(date: string) => setPerson({...person, birth: date})}
                             /> 
                             <ComboBoxPerson 
                                 clubs={clubs}

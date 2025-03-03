@@ -13,3 +13,7 @@ export interface DateInformation {
     totalDays: number[],
     weeks: number[][]
 }
+export interface DayObject {
+    day: number,
+    isCurrentMonth: boolean
+}

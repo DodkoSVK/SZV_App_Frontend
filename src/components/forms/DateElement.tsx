@@ -6,7 +6,7 @@ import isoWeek from "dayjs/plugin/isoWeek";
 import 'dayjs/locale/sk';
 import { useEffect, useState,useRef, MouseEvent, ChangeEvent } from "react";
 //Types
-import { SelectingDate, SelectedDate, DateInformation } from "../../assets/types/datePicker";
+import { SelectingDate, SelectedDate, DateInformation, DayObject } from "../../assets/types/datePicker";
 //Children
 import MonthPicker from "../dateElement/MonthPicker";
 import YearPicker from "../dateElement/YearPicker";
@@ -16,15 +16,12 @@ dayjs.extend(timezone);
 dayjs.locale("sk");
 dayjs.extend(isoWeek);
 
-const getMonthDays = (y: number, m: number) => {
-  const startOfMonth = dayjs(new Date(y, m, 1));
-  const endOfMonth = dayjs(new Date(y, m +1, 0));
-  
-}
+
 
 interface Props {
   elementLabel: string
   elementValue: string
+  setPersonBirth: (date: string) => void
 
 
   /* dateValue: string
@@ -40,24 +37,93 @@ const DateElement: React.FC<Props> = (props) => {
     month: dayjs().tz("Europe/Bratislava").month(),    
     day: dayjs().tz("Europe/Bratislava").date(),   
   }); 
-  const [dateInfo, setDateInfo] = useState<DateInformation | null>(null);
+  const [monthName, setMonthName] = useState<string>();
+  const [daysOfMonth, setDaysOfMonth] = useState<DayObject[][]>([]);
 
-  const { elementLabel, elementValue } = props
-
+  const { elementLabel, elementValue, setPersonBirth } = props
+  const dateInput = useRef<HTMLInputElement>(null);
   //Change input value
   const handleInputValue = (e: ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
     setDate(e.target.value);     
   }
   const handleDateSelectors = () => {
     setSelectingState({...selectingState, date: true});
   }
+  const handleChangeMonth = (e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const id = e.currentTarget.id;
+    if(id === "prevMonth") {
+      const prevMonth = selectedDate.month - 1;
+      if( prevMonth < 0 ){
+        setSelectedDate({
+          ...selectedDate, 
+          month: 11,
+          year: selectedDate.year-1
+        });
+      } else {
+        setSelectedDate({
+          ...selectedDate,
+          month: prevMonth
+        });
+      }      
+    }
+    else if (id === "nextMonth") {
+      const nextMonth = selectedDate.month + 1;
+      if ( nextMonth > 11 ) {
+        setSelectedDate({
+          ...selectedDate,
+          month: 0,
+          year: selectedDate.year + 1
+        });
+      } else {
+        setSelectedDate({
+          ...selectedDate,
+          month: nextMonth
+        });
+      }
+    }    
+  }
+  const handleSelectDay = (day: number) => {
+    console.log(`Den: ${day}`);
+    if(dateInput.current)
+      dateInput.current.value = `${day}.${selectedDate.month}.${selectedDate.year}`;
+    setPersonBirth(`${selectedDate.year}.${selectedDate.month}.${day}`)
+    setSelectingState({...selectingState, date: false})
+  }
 
-  const dateInput = useRef<HTMLInputElement>(null);
+  const getMonthDays = (y: number, m: number) => {
+    const startOfMonth = dayjs(new Date(y, m, 1));
+    const endOfMonth = dayjs(new Date(y, m +1, 0));
+    const weeks = [];
+  
+    let currentWeek = [];
+    let currentDate = startOfMonth.startOf('week');
+  
+    while(currentDate.isBefore(endOfMonth.endOf('week'))) {
+      for (let i = 0; i < 7; i++) {
+        currentWeek.push({
+          day: currentDate.date(),
+          isCurrentMonth: currentDate.month() === m
+        });
+        currentDate = currentDate.add(1, 'day')
+      }
+      weeks.push(currentWeek);
+      currentWeek = [];
+    }
+    setDaysOfMonth(weeks);
+  }
+  
 
   useEffect(() => {
     setDate(elementValue)
-    if (dateInput.current) dateInput.current.value = date;
+    if (dateInput.current) dateInput.current.value = date;   
   }, [date]);
+
+  useEffect(() => {
+    getMonthDays( selectedDate.year, selectedDate.month );
+    setMonthName(dayjs().tz("Europe/Bratislava").month(selectedDate.month).format("MMMM"));
+  }, [selectedDate])
   return (
     <div className="relative z-0 w-full mb-5 group capitalize">
       <input               
@@ -106,40 +172,36 @@ const DateElement: React.FC<Props> = (props) => {
           
           <div className="flex flex-row gap-2 mb-2 font-bold text-gray-50">
             <div className="flex flex-row grow-6 justify-between items-center p-2 rounded-lg  bg-[#328CC1]">
-              <div className="ml-5 transition-transform duration-300 hover:text-[#D9B310] hover:scale-150">
+              <div id="prevMonth" onClick={handleChangeMonth} className="ml-5 transition-transform duration-300 hover:text-[#D9B310] hover:scale-150">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
                   <path fill-rule="evenodd" d="M14 8a.75.75 0 0 1-.75.75H4.56l1.22 1.22a.75.75 0 1 1-1.06 1.06l-2.5-2.5a.75.75 0 0 1 0-1.06l2.5-2.5a.75.75 0 0 1 1.06 1.06L4.56 7.25h8.69A.75.75 0 0 1 14 8Z" clip-rule="evenodd" />
                 </svg>
               </div>
               <div className="hover:text-[#D9B310]">
-                <p>Mesiac</p>
+                <p>{ monthName }</p>
               </div>
-              <div className="mr-5 transition-transform duration-300 hover:text-[#D9B310] hover:scale-150">
+              <div id="nextMonth" onClick={handleChangeMonth} className="mr-5 transition-transform duration-300 hover:text-[#D9B310] hover:scale-150">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="size-4">
                   <path fill-rule="evenodd" d="M2 8c0 .414.336.75.75.75h8.69l-1.22 1.22a.75.75 0 1 0 1.06 1.06l2.5-2.5a.75.75 0 0 0 0-1.06l-2.5-2.5a.75.75 0 1 0-1.06 1.06l1.22 1.22H2.75A.75.75 0 0 0 2 8Z" clip-rule="evenodd" />
                 </svg>
               </div>             
             </div>
             <div className="flex grow-4 justify-center items-center p-1 rounded-lg bg-[#328CC1] hover:text-[#D9B310]">
-              <p>Rok</p>
+              <p>{ selectedDate.year }</p>
             </div>
           </div>
-          <table className="w-full">                   
+          <table className="w-full rounded-lg bg-[#328CC1] font-bold">                   
             <tbody>
-              {Array.isArray(dateInfo?.weeks) ? (
-                dateInfo?.weeks.map((week, weekIndex) => (
+            {daysOfMonth.length > 0 ? (
+                daysOfMonth.map((week, weekIndex) => (
                   <tr key={weekIndex} className="grid grid-cols-7">
-                    {week.map((day, dayIndex) => (
+                    {week.map((dayObj, dayIndex) => (
                       <td
+                        onClick={() => handleSelectDay(dayObj.day)}
                         key={dayIndex}
-                        className="relative flex justify-center items-center text-[#F7F9FB] text-lg hover:text-black aspect-square"
-                        /* onClick={() => {                          
-                          handleSelectDay(day);
-                        }} */
+                        className={`relative flex justify-center items-center text-md aspect-square ${dayObj.isCurrentMonth ? 'text-white' : 'text-gray-400 pointer-events-none'}`}
                       >
-                        {day !== null ? (
-                          <span className="absolute inset-0 flex justify-center items-center hover:bg-[#D9B310] hover:rounded-lg hover:font-bold">{day}</span>
-                        ) : null}
+                        <span className={`absolute inset-0 flex justify-center items-center m-2 ${dayObj.isCurrentMonth ? 'hover:bg-[#D9B310] hover:text-[#328CC1] hover:rounded-full hover:font-bold' : 'disabled'}`}>{dayObj.day}</span>
                       </td>
                     ))}
                   </tr>
