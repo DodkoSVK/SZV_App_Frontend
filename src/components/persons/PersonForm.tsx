@@ -19,7 +19,7 @@ interface Props {
     closeUI: () => void;
     createPerson: (person: Person) => void;
     updatePerson: (person: Person) => void;
-    deletePerson: (person: Person) => void;
+    deletePerson: (personId: number) => void;
 }
 
 const PersonForm: React.FC<Props> = (props) => {
@@ -27,7 +27,7 @@ const PersonForm: React.FC<Props> = (props) => {
     const [person, setPerson] = useState<Person>(defaultPerson);
     const [clubs, setClubs] = useState<Club[] | { message: string }>([]);
 
-    const { formTitle, personData, closeUI, createPerson, updatePerson } = props;
+    const { formTitle, personData, closeUI, createPerson, updatePerson, deletePerson } = props;
     //New
     const fetchClubs = async () => {
         const response = await getClubs();
@@ -59,6 +59,8 @@ const PersonForm: React.FC<Props> = (props) => {
             createPerson(person);
         else if (formButton.name === "update")
             updatePerson(person);
+        else if (formButton.name === "delete")
+            deletePerson(person.id);
     }
 
     //Only once

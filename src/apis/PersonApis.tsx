@@ -64,17 +64,39 @@ export const createPerson = async (person: CreatePerson) => {
 }
 export const updatePerson = async (id: number,person: EditPerson) => {
     console.log(`🟡 Upravujem osobu s týmito údajmi: ${JSON.stringify(person)}`);
-    return axios.patch(`https://app.vzpieranie.sk:3002/api/person/${id}`)
+    return axios.patch(`https://app.vzpieranie.sk:3002/api/person/${id}`, person)  
     .then(res => {
         const code = res.status;
-        if(code === 201) return 1;           
+        if (code >= 200 && code < 300) return 1;          
     }).catch(e => {
         const code = e.status;            
         console.log(`🔴 Chyba pri úprave osoby: ${code}`);
         if(code >= 400 && code < 500) return 2;                                      
         if(code >= 500) return 3;   
-    })
+    });
 }
+export const deletePerson = async (id: number) => {
+    console.log(`🟡 Mažem osobu s ID: ${id}`);
+     /* return axios.delete(`https://app.vzpieranie.sk:3002/api/person/${id}`) */
+    return axios.delete(`http://localhost:3002/api/person/${id}`)   
+    .then(res => {
+        const code = res.status;
+        console.log(`Code: ${code}`);
+        if(code >= 200 && code < 300) {
+            console.log(`Tralala`);
+            return 1;
+        }
+        return 2;                  
+    }).catch(e => {
+        console.log(`Response ${JSON.stringify(e)}`)
+        const code = e.status;
+        console.log(`Code: ${code}`);
+        console.log(`🔴 Chyba pri mazaní osoby: ${code}`)
+        if(code >= 400 && code < 500) return 2;  
+        if(code === 500) return 3;  
+        return 3;
+    });
+};
 
 /* export const editClub = async (club: EditClub) => {
     console.log(`🟡 Editujem klub: ${club.name}`);

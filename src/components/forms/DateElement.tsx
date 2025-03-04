@@ -87,8 +87,8 @@ const DateElement: React.FC<Props> = (props) => {
   const handleSelectDay = (day: number) => {
     console.log(`Den: ${day}`);
     if(dateInput.current)
-      dateInput.current.value = `${day}.${selectedDate.month}.${selectedDate.year}`;
-    setPersonBirth(`${selectedDate.year}.${selectedDate.month}.${day}`)
+      dateInput.current.value = `${day}.${selectedDate.month + 1}.${selectedDate.year}`;
+    setPersonBirth(`${selectedDate.year}.${selectedDate.month + 1}.${day}`)
     setSelectingState({...selectingState, date: false})
   }
 
