@@ -82,12 +82,12 @@ const ThePersons: React.FC = () => {
         console.log(`Ta mazem personu: ${personId}`);
         const deleteStatus = await deletePerson(personId);
         console.log(`Delete status ${deleteStatus}`);
-        /* if (deleteStatus === 1 ) 
+        if (deleteStatus === 1 ) 
             setAlert({ alertType: true, alertMessage: "Osoba odstránená"});            
         else if ( deleteStatus === 2 ) 
             setAlert({ alertType: false, alertMessage: "Nepodarilo sa odstrániť osobu."});         
         else if ( deleteStatus === 3)
-            setAlert({ alertType: false, alertMessage: "Nepodarilo sa odstrániť osobu. Chyba na strane servera"}); */
+            setAlert({ alertType: false, alertMessage: "Nepodarilo sa odstrániť osobu. Chyba na strane servera"});
         handleCloseFormUI();
         handleFetchAllPeoples();
     };

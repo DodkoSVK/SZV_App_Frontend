@@ -10,8 +10,7 @@ export interface SelectedDate {
 }
 export interface DateInformation {
     monthName: string,
-    totalDays: number[],
-    weeks: number[][]
+    totalDays: number[]    
 }
 export interface DayObject {
     day: number,
