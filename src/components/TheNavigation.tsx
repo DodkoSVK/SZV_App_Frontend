@@ -28,6 +28,12 @@ function TheNavigation() {
                         className={({ isActive }) => isActive ? 'underline underline-offset-4 decoration-2 text-[#D9B310] hover:text-[#D9B310]' : 'text-[#F7F9FB] hover:text-[#D9B310]'}
                     >Ľudia</NavLink>
                 </li>
+                <li>
+                    <NavLink
+                        to="/competitions"
+                        className={({ isActive }) => isActive ? 'underline underline-offset-4 decoration-2 text-[#D9B310] hover:text-[#D9B310]' : 'text-[#F7F9FB] hover:text-[#D9B310]'}
+                    >Súťaže</NavLink>
+                </li>
             </ul>
             <div>
                 <button 
