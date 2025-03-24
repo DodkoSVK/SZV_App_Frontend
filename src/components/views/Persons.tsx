@@ -5,13 +5,13 @@ import { Person, CreatePerson, EditPerson } from "../../assets/types/personTypes
 //Children Components
 import PersonsTable from "../persons/PersonsTable";
 import PersonForm from "../persons/PersonForm";
-import { FormUI, Alert } from "../../assets/types";
+import { FormUI, Alert } from "../../assets/types/index";
 import SuccessAlert from "../alerts/SuccessAlert";
 import FailedAlert from "../alerts/FailedAlert";
 //Component
 const ThePersons: React.FC = () => {
     const [persons, setPersons] = useState<Person[] | {message: string}>({ message: ""});
-    const [processPerson, setProcessPerson] = useState<Person>();
+    const [editingPerson, setEditingPerson] = useState<Person>();
     const [formUiData, setFormUiData] = useState<FormUI>();
     const [alert, setAlert] = useState<Alert>();
 
@@ -33,9 +33,10 @@ const ThePersons: React.FC = () => {
         else 
             setPersons({message: results.message});           
     };
+    //Get person by id
     const handleSearchPersonById = (idPerson: number) => {
         if (Array.isArray(persons))
-            setProcessPerson(persons.find(person => person.id === idPerson))
+            setEditingPerson(persons.find(person => person.id === idPerson))
     };
     const handleCreatePerson = async (person: Person) => {
         const creatingPerson: CreatePerson = {
@@ -102,7 +103,7 @@ const ThePersons: React.FC = () => {
     };
     const handleCloseFormUI = () => {
         setFormUiData({state: false, formTitle: ""})
-        setProcessPerson(undefined);
+        setEditingPerson(undefined);
     };
     const handleCloseAlert = () => {
         setAlert(undefined);
@@ -125,7 +126,7 @@ const ThePersons: React.FC = () => {
                 <PersonForm 
                     formTitle={formUiData.formTitle}
                     closeUI={handleCloseFormUI}
-                    personData={processPerson}
+                    personData={editingPerson}
                     createPerson={handleCreatePerson}
                     updatePerson={handleUpdatePerson}
                     deletePerson={handleDeletePerson}

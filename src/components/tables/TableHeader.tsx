@@ -3,15 +3,17 @@ import plusIcon from '../../assets/plus.svg';
 
 interface Props {
     headerData: TableHeaderData[];
-    addTitle: string
+    addButtonText: string,
+    handleAddButton: () => void
 };
 
 const TableHeader: React.FC<Props> = (props) => {
     //Import props
-    const { headerData, addTitle } = props;
+    const { headerData, addButtonText, handleAddButton } = props;
 
-    return (        
-        <tr>                       
+    return (
+        <thead className="text-xs uppercase bg-[#0B3C5D]">
+            <tr>                       
             {Array.isArray(headerData) && headerData.length > 0 ? (
                 <>
                 {headerData.map(header => (
@@ -31,8 +33,8 @@ const TableHeader: React.FC<Props> = (props) => {
                 ))}
                 <th scope="col" className="px-6 py-3">
                             <div className="flex items-center">
-                                <button className="flex items-center space-x-2 uppercase">
-                                    <span>{addTitle}</span>
+                                <button onClick={handleAddButton} className="flex items-center space-x-2 uppercase">
+                                    <span>{addButtonText}</span>
                                     <img src={plusIcon} alt="Add" className="w-6 h-6" />
                                 </button>
                             </div>
@@ -43,7 +45,8 @@ const TableHeader: React.FC<Props> = (props) => {
                     Nedokazal som nacitat ziadne data.
                 </th>
             )} 
-        </tr>                              
+        </tr>          
+        </thead>                                  
     );
 };
 
