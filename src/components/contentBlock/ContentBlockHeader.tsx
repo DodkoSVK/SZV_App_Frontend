@@ -1,3 +1,4 @@
+import { MouseEvent } from "react";
 //Components
 import OrangeButton  from "../buttons/OrangeButton";
 import RedButton from "../buttons/RedButton";
@@ -5,10 +6,12 @@ import GreenButton from "../buttons/GreenButton";
 
 interface Props {
     headerTitle: string
+    competitionId: number
+    handleClickButton: (type: boolean, id: number, e: MouseEvent<HTMLButtonElement>) => void
 }
 
 const ContentBlockHeader: React.FC<Props> = (props) => {
-    const { headerTitle } = props;
+    const { headerTitle, competitionId, handleClickButton } = props;
 
     return (
         <div className="flex flex-row justify-between items-center border-b border-gray-500 border-solid">
@@ -21,21 +24,21 @@ const ContentBlockHeader: React.FC<Props> = (props) => {
                         buttonText="Pridať skupinu"
                         buttonName="create"
                         size="sm"
-                        clickAction={console.log(`Click`)}
+                        clickAction={(e) => handleClickButton(true,competitionId, e)}
                     />
                     <OrangeButton 
                         buttonType="button"
                         buttonText="Upraviť súťaž"
                         buttonName="edit"
                         size="sm"
-                        clickAction={console.log(`Click`)}
+                        clickAction={(e) => handleClickButton(false,competitionId, e)}
                     />
                     <RedButton
                         buttonType="button"
                         buttonText="Zmazať súťaž"
                         buttonName="delete"
                         size="sm"
-                        clickAction={console.log(`Click`)}
+                        clickAction={(e) => handleClickButton(false,competitionId, e)}
                     />
                 </div>
             </div>

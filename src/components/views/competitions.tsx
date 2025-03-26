@@ -1,36 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, MouseEvent } from "react";
 //Methods
 import { getCompetitions } from "../../apis/CompetitionApis";
 //Types
 import { Competition } from "../../assets/types/competitionTypes";
 import { FormUI } from "../../assets/types/index";
 //Children Components
-//import Table from "../tables/Table";
-//import CompetitionForm from "../competitions/CompetitionForm";
+import CompetitionForm from "../competitions/CompetitionForm";
 import ContentBlock from "../contentBlock/ContentBlock";
 
 const TheCompetitions: React.FC = () => {
-    //const [competitions, setCompetitions] = useState<Competition[] | { message: string }>({message: "Načítavam súťaže..."});
-    const [competitions, setCompetitions] = useState<Competition[] | { message: string }>({ message: "Načítavam súťaže..." });
-    
+    const [competitions, setCompetitions] = useState<Competition[] | { message: string }>({ message: "Načítavam súťaže..." });    
     const [editingCompetition, setEditingCompetition] = useState<Competition>();
     const [formUiData, setFormUiData] = useState<FormUI>();
 
-    // Fetching all competitions
-    /* const fetchCompetitions = async () => {
-        const data = await getCompetitions();
-        if (Array.isArray(data)) {
-            setCompetitions(data.map((competition) => ({
-                id: competition.clid,
-                league: competition.name,
-                group: competition.group_name,
-                city: competition.city,
-                date: competition.date,
-                round: competition.round
-            })))
-        }
-        console.log(`🟢 Súťaže: ${JSON.stringify(competitions)}`);
-    }; */
+    // Fetching all competitions    
     const fetchCompetitions = async () => {
         const data = await getCompetitions();
     
@@ -66,20 +49,30 @@ const TheCompetitions: React.FC = () => {
     const handleSearchCompetitionById = (idCompetition: number) => {
         if (Array.isArray(competitions)) 
             setEditingCompetition(competitions.find(competition => competition.id === idCompetition));
-
-        console.log(`🟢 Upravujem súťaž: ${JSON.stringify(editingCompetition)}`);
     };
 
     // Open form UI
-    const handleOpenFormUI = (idCompetition: number) => {
-        if(idCompetition === 0)            
-            setFormUiData({ state: true, formTitle: "Vytvoriť novú súťaž"});
-        else {
-            console.log("Upraviť súťaž");            
-            handleSearchCompetitionById(idCompetition);
-            setFormUiData({ state: true, formTitle: "Upraviť súťaž"});
-        }
+    const handleOpenFormUI = (type: boolean, id: number, e: MouseEvent<HTMLButtonElement>) => {
+        const button = e.currentTarget.name;
+        console.log(`ID: ${id}, button: ${button}, type: ${type}`)
+        if(type) {
+            console.log(`Idem robit operaciu so skupinou: ${id}`)
+            if(button === "create") {
+                console.log(`Ideme vytvorit novu skupinu pre sutaz: ${id}`)
+                handleSearchCompetitionById(id);
+                setFormUiData({
+                    state: true,
+                    formTitle: "Úprava súťaže"
+                })
+            }
+            
+        } else {
+            console.log(`Idem robit operaciu so sutazou ${id}`)
+        }       
     };
+    useEffect(() => {        
+        console.log(`🟢 Upravujem súťaž: ${JSON.stringify(editingCompetition)}`);
+    }, [editingCompetition])
     useEffect(() => {
         console.log(`Sutaze: ${JSON.stringify(competitions)}`);
     }, [competitions]);
@@ -97,11 +90,20 @@ const TheCompetitions: React.FC = () => {
                     <ContentBlock 
                         key={competition.id}
                         headerTitle={`${competition.round.toString()}. kolo - ${competition.league}`}
+                        competitionID={competition.id}
                         locations={competition.locations}
+                        handleClickButton={handleOpenFormUI}
                     />
                 ))
             ) : (
-                <ContentBlock headerTitle="Neni súťaž" />
+                <ContentBlock 
+                    headerTitle="Neni súťaž" />
+            )}
+            { formUiData?.state && (
+                <CompetitionForm 
+                    formTitle={formUiData.formTitle}
+                    competitionData={editingCompetition}
+                />
             )}
         </article>
     );
