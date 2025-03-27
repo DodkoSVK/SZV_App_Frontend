@@ -11,11 +11,11 @@ export interface CompetitionLocation {
     group: string;
     city: string;
     date: string;
-    }
+}
     
     export interface Competition {
     id: number;
     league: string;
     round: string;
     locations: CompetitionLocation[];
-    }
+}
