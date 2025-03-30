@@ -23,13 +23,12 @@ const ContentBlock: React.FC<Props> = (props) => {
                 headerTitle={headerTitle}
                 competitionId={competitionID}
                 handleClickButton={handleClickButton}/>
-            <div className="pt-6 pl-10">
+            <div className=" pl-10">
                 {Array.isArray(locations) && locations.length > 0 ? (
                     locations.map(location => (
                         <ContentBlockItem 
                             key={location.id} 
                             compLocation={location}
-                            handleClickButton={handleClickButton}
                         />
                     ))
                 ) : (

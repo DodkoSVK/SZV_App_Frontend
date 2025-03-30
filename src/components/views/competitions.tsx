@@ -59,11 +59,15 @@ const TheCompetitions: React.FC = () => {
             console.log(`Idem robit operaciu so skupinou: ${id}`)
             if(button === "create") {
                 console.log(`Ideme vytvorit novu skupinu pre sutaz: ${id}`)
+                
+            }
+            if(button === "edit") {
+                console.log(`Ideme upravit sutaz: ${id}`)
                 handleSearchCompetitionById(id);
                 setFormUiData({
                     state: true,
                     formTitle: "Úprava súťaže"
-                })
+                })               
             }
             
         } else {
