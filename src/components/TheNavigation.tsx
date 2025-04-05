@@ -1,5 +1,7 @@
 import { NavLink } from "react-router";
 
+
+
 function TheNavigation() {
     return (      
         <nav className="flex flex-row items-center justify-around bg-[#0B3C5D] bg-opacity-90 text-[#F7F9FB] uppercase rounded-xl ">

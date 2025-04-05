@@ -2,7 +2,7 @@ import { useEffect, useState, MouseEvent } from "react";
 //Methods
 import { getCompetitions } from "../../apis/CompetitionApis";
 //Types
-import { Competition } from "../../assets/types/competitionTypes";
+import { Competition, defaultCompetition } from "../../assets/types/competitionTypes";
 import { FormUI } from "../../assets/types/index";
 //Children Components
 import CompetitionForm from "../competitions/CompetitionForm";
@@ -10,7 +10,7 @@ import ContentBlock from "../contentBlock/ContentBlock";
 
 const TheCompetitions: React.FC = () => {
     const [competitions, setCompetitions] = useState<Competition[] | { message: string }>({ message: "Načítavam súťaže..." });    
-    const [editingCompetition, setEditingCompetition] = useState<Competition>();
+    const [editingCompetition, setEditingCompetition] = useState<Competition>(defaultCompetition);
     const [formUiData, setFormUiData] = useState<FormUI>();
 
     // Fetching all competitions    
@@ -47,8 +47,11 @@ const TheCompetitions: React.FC = () => {
 
     //Seach competition by id in fetched competitions
     const handleSearchCompetitionById = (idCompetition: number) => {
-        if (Array.isArray(competitions)) 
-            setEditingCompetition(competitions.find(competition => competition.id === idCompetition));
+        if (idCompetition !== 0) {
+            if (Array.isArray(competitions)) 
+                setEditingCompetition(competitions.find(competition => competition.id === idCompetition) || defaultCompetition);
+        }
+           
     };
 
     // Open form UI
@@ -74,6 +77,11 @@ const TheCompetitions: React.FC = () => {
             console.log(`Idem robit operaciu so sutazou ${id}`)
         }       
     };
+    //Close Form UI
+    const handleCloseFormUI = () => {
+        setFormUiData({ state: false, formTitle: "" });
+        setEditingCompetition(defaultCompetition);
+    }
     useEffect(() => {        
         console.log(`🟢 Upravujem súťaž: ${JSON.stringify(editingCompetition)}`);
     }, [editingCompetition])
@@ -88,6 +96,12 @@ const TheCompetitions: React.FC = () => {
         <article>
             <div className="m-8 text-3xl font-bold text-center text-[#F7F9FB] uppercase">
                 <h1>Súťaže SZV</h1>
+                <button onClick={() => setFormUiData({ state: true, formTitle: "Vytvorenie súťaže" })}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                </button>
+
             </div>
             {Array.isArray(competitions) && competitions.length > 0 ? (
                 competitions.map(competition => (
@@ -107,6 +121,7 @@ const TheCompetitions: React.FC = () => {
                 <CompetitionForm 
                     formTitle={formUiData.formTitle}
                     competitionData={editingCompetition}
+                    closeUI={() => handleCloseFormUI()}
                 />
             )}
         </article>

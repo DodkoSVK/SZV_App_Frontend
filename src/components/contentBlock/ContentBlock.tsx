@@ -7,9 +7,9 @@ import ContentBlockItem from "./ContentBlockItem";
 
 interface Props {
     headerTitle: string;
-    competitionID: number;
+    competitionID?: number;
     locations?: CompetitionLocation[];
-    handleClickButton: (type: boolean, id: number, e: MouseEvent<HTMLButtonElement>) => void;
+    handleClickButton?: (type: boolean, id: number, e: MouseEvent<HTMLButtonElement>) => void;
 }
 
 const ContentBlock: React.FC<Props> = (props) => {
@@ -21,8 +21,9 @@ const ContentBlock: React.FC<Props> = (props) => {
         <div className="relative overflow-x-auto shadow-md rounded-lg mx-10 my-6 border border-gray-500 border-solid p-4 bg-gray-800 text-white">
             <ContentBlockHeader 
                 headerTitle={headerTitle}
-                competitionId={competitionID}
-                handleClickButton={handleClickButton}/>
+                competitionId={competitionID || 0}
+                handleClickButton={handleClickButton || (() => {})}
+            />
             <div className=" pl-10">
                 {Array.isArray(locations) && locations.length > 0 ? (
                     locations.map(location => (
