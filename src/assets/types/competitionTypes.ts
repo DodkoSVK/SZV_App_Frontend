@@ -11,18 +11,24 @@ export interface CompetitionLocation {
     id: number;
     group: string;
     city: string;
-    date: string;
+    club: number
 }
     
 export interface Competition {
     id: number;
-    league: string;
+    league: number;
     round: string;
+    date: string;
     locations: CompetitionLocation[];
 }
 export const defaultCompetition: Competition = {
     id: 0,
-    league: "",
+    league: 0,
     round: "",
+    date: "",
     locations: []
+}
+export interface Leagues {
+    id: number;
+    name: string;
 }

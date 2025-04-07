@@ -20,6 +20,7 @@ export const getClubs = async () => {
         return { message: "Chyba pri získavaní klubov" }; 
     });
 };
+
 //Getting sorted clubs from DB
 export const getSortedClubs = async (key: string) => {    
     console.log(`🟡 Filtrujem všetky kluby podľa: ${key}`);

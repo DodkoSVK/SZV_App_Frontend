@@ -4,7 +4,7 @@ interface Props {
     inputValue: string
     inputLabel: string,
     inputName: string
-    handleOnChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    handleOnChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const InputElement: React.FC<Props> = (props) => {

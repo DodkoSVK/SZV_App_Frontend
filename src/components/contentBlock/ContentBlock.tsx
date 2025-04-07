@@ -13,10 +13,7 @@ interface Props {
 }
 
 const ContentBlock: React.FC<Props> = (props) => {
-
     const { headerTitle, competitionID, locations, handleClickButton } = props;
-    //console.log(`Locations: ${JSON.stringify(locations)}`);  
-
     return (
         <div className="relative overflow-x-auto shadow-md rounded-lg mx-10 my-6 border border-gray-500 border-solid p-4 bg-gray-800 text-white">
             <ContentBlockHeader 
@@ -32,12 +29,10 @@ const ContentBlock: React.FC<Props> = (props) => {
                             compLocation={location}
                         />
                     ))
-                ) : (
-                    <p>Žiadne lokality</p>
-                )}
+                ) : null}
             </div>            
         </div>
-    );
-    
+    );    
 };
+
 export default ContentBlock;

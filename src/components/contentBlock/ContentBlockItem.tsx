@@ -10,7 +10,7 @@ const ContentBlockItem: React.FC<Props> = (props) => {
 
     return (
         <div className="flex flex-row text-l pt-4 font-bold items-center justify-between border-b border-gray-500 border-solid">
-            <h3>{`${compLocation.city} - Skupina ${compLocation.group}, ${compLocation.date}`}</h3>                    
+            <h3>{`${compLocation.city} - Skupina ${compLocation.group}`}</h3>                    
         </div>
     );
 };

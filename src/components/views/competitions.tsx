@@ -1,6 +1,6 @@
 import { useEffect, useState, MouseEvent } from "react";
 //Methods
-import { getCompetitions } from "../../apis/CompetitionApis";
+import { getCompetitions, createCompetition } from "../../apis/CompetitionApis";
 //Types
 import { Competition, defaultCompetition } from "../../assets/types/competitionTypes";
 import { FormUI } from "../../assets/types/index";
@@ -21,22 +21,21 @@ const TheCompetitions: React.FC = () => {
             const grouped: Record<number, Competition> = {};
     
             data.forEach(row => {
-                const compId = row.cid;
-    
+                const compId = row.cid;    
                 if (!grouped[compId]) {
                     grouped[compId] = {
                         id: compId,
                         league: row.name,
                         round: row.round,
+                        date: row.date,
                         locations: []
                     };
-                }
-    
+                }    
                 grouped[compId].locations.push({
                     id: row.clid,
                     group: row.group_name,
                     city: row.city,
-                    date: row.date
+                    club: row.club_id                    
                 });
             });
     
@@ -51,7 +50,6 @@ const TheCompetitions: React.FC = () => {
             if (Array.isArray(competitions)) 
                 setEditingCompetition(competitions.find(competition => competition.id === idCompetition) || defaultCompetition);
         }
-           
     };
 
     // Open form UI
@@ -82,6 +80,20 @@ const TheCompetitions: React.FC = () => {
         setFormUiData({ state: false, formTitle: "" });
         setEditingCompetition(defaultCompetition);
     }
+
+    const handleCreateCompetition = (competition: Competition) => {
+        console.log(`Vytvorenie sutaze: ${JSON.stringify(competition)}`); 
+        createCompetition(competition);
+
+    }
+    const handleUpdateCompetition = (competition: Competition) => {
+        console.log(`Upravenie sutaze: ${JSON.stringify(competition)}`); 
+    }
+    const handleDeleteCompetition = (competitionID: number) => { 
+        console.log(`Zmazanie sutaze: ${JSON.stringify(competitionID)}`); 
+    }
+
+
     useEffect(() => {        
         console.log(`🟢 Upravujem súťaž: ${JSON.stringify(editingCompetition)}`);
     }, [editingCompetition])
@@ -107,7 +119,7 @@ const TheCompetitions: React.FC = () => {
                 competitions.map(competition => (
                     <ContentBlock 
                         key={competition.id}
-                        headerTitle={`${competition.round.toString()}. kolo - ${competition.league}`}
+                        headerTitle={`${competition.round.toString()}. kolo - ${competition.league}, ${competition.date}`}
                         competitionID={competition.id}
                         locations={competition.locations}
                         handleClickButton={handleOpenFormUI}
@@ -115,13 +127,16 @@ const TheCompetitions: React.FC = () => {
                 ))
             ) : (
                 <ContentBlock 
-                    headerTitle="Neni súťaž" />
+                    headerTitle="Nie je žiadna súťaž" />
             )}
             { formUiData?.state && (
                 <CompetitionForm 
                     formTitle={formUiData.formTitle}
                     competitionData={editingCompetition}
-                    closeUI={() => handleCloseFormUI()}
+                    onClose={() => handleCloseFormUI()}
+                    onCreateCompetition={(competition: Competition) => handleCreateCompetition(competition)}
+                    onEditCompetition={(competition: Competition) => handleUpdateCompetition(competition)}
+                    onDeleteCompetition={(competitionID: number) => handleDeleteCompetition(competitionID)}
                 />
             )}
         </article>

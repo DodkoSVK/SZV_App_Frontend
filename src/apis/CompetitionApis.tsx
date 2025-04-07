@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Competition } from "../assets/types/competitionTypes";
 
 export const getCompetitions = async () => {
     console.log("🟡 Získavam všetky súťaže");
@@ -17,3 +18,16 @@ export const getCompetitions = async () => {
         return { message: "Chyba pri získavaní súťaží" }; 
     });
 };
+
+export const createCompetition = async (competition: Competition) => {
+    console.log("🟡 Vytváram súťaž s týmito údajmi: ", competition);
+    return axios.post('http://localhost:3002/api/competition', competition).then(response => {            
+        const code = response.status;            
+        if (code >= 200 && code < 300) return 1;                
+    }).catch(error => {
+        const code = error.status;            
+        console.log(`🔴 Chyba pri vytváraní súťaže: ${code}`);
+        if(code >= 400 && code < 500) return 2;                      
+        if(code >= 500) return 3;                             
+    });
+}

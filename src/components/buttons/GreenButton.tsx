@@ -1,29 +1,31 @@
-import { MouseEvent } from "react";
+import { MouseEvent, ReactNode } from "react";
 
 interface Props {
     buttonType: "submit" | "reset" | "button";
-    buttonText: string;
+    buttonText?: string; // stále môžeš použiť len text
     buttonName: string;
     clickAction?: (e: MouseEvent<HTMLButtonElement>) => void;
     size?: "sm" | "md" | "lg";
+    children?: ReactNode; // umožní <span> + <svg> kombináciu
 }
 
 const GreenButton: React.FC<Props> = (props) => {
+    const {buttonType, buttonText, buttonName, clickAction, size = "md", children,} = props;
     const sizeClassMap = {
         sm: "text-xs px-3 py-1.5",
         md: "text-sm px-5 py-2.5",
-        lg: "text-base px-6 py-3"
+        lg: "text-base px-6 py-3",
     };
-
-    const sizeClass = sizeClassMap[props.size ?? "md"];
+    const sizeClass = sizeClassMap[size];
 
     return (
         <button
-            onClick={props.clickAction}
-            name={props.buttonName}
-            type={props.buttonType}
-            className={`text-green-700 capitalize hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-center me-2 mb-2 ${sizeClass}`}>
-            {props.buttonText}
+        onClick={clickAction}
+        name={buttonName}
+        type={buttonType}
+        className={`flex flex-row items-center gap-2 rounded-lg border border-green-500 text-green-500 cursor-pointer hover:bg-green-500 hover:text-white ${sizeClass}`}
+        >
+        {children ? children : <span>{buttonText}</span>}
         </button>
     );
 };
