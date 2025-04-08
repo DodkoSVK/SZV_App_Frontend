@@ -2,7 +2,7 @@ import { useEffect, useState, MouseEvent } from "react";
 //Methods
 import { getCompetitions, createCompetition } from "../../apis/CompetitionApis";
 //Types
-import { Competition, defaultCompetition, RawCompetition } from "../../assets/types/competitionTypes";
+import { Competition, defaultCompetition } from "../../assets/types/competitionTypes";
 import { FormUI } from "../../assets/types/index";
 //Children Components
 import CompetitionForm from "../competitions/CompetitionForm";
@@ -15,7 +15,7 @@ const TheCompetitions: React.FC = () => {
 
     // Fetching all competitions    
     const fetchCompetitions = async () => {
-        const data: Competition[] = await getCompetitions();
+        const data = await getCompetitions();
         console.log("📦 Raw competitions:", data);
 
         if (Array.isArray(data)) {
