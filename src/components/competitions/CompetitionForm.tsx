@@ -12,8 +12,8 @@ import { getLeagues } from "../../apis/leagueApis";
 import { getClubs } from "../../apis/ClubApis";
 
 interface Props {
-    formTitle?: string;
-    competitionData?: Competition
+    formTitle: string;
+    competitionData: Competition
     onClose: () => void;
     onCreateCompetition: (competition: Competition) => void;
     onEditCompetition: (competition: Competition) => void;
@@ -30,7 +30,28 @@ const CompetitionForm: React.FC<Props> = (props) => {
     const isEdit = competitionData && competitionData.id > 0;
     const buttonName = isEdit ? "edit" : "create";
 
-    //Handle esx key
+    //Fetch leagues and clubs from API
+    const fetchLeagues = async () => {
+        const leagues = await getLeagues();
+        console.log("🔁 useEffect leagues:", JSON.stringify(leagues));    
+        if (Array.isArray(leagues) && leagues.length > 0) {
+            setLeagues(leagues.map((league) => ({
+                id: league.id,
+                name: league.name
+            })));
+        }
+    };
+    //Fetch clubs from API
+    const fetchClubs = async () => {
+        const clubs = await getClubs();
+        if(Array.isArray(clubs) && clubs.length > 0) {
+            setClubs(clubs.map((club) => ({
+                id: club.id,
+                name: club.name
+            })));
+        }            
+    };        
+    //Handle esc key
     const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === 'Escape') 
             onClose();            
@@ -57,7 +78,6 @@ const CompetitionForm: React.FC<Props> = (props) => {
             }
         })        
     }
-
     //Input change event
     const handleInputsChange = (e: ChangeEvent<HTMLInputElement>, locationID: number) => {
         const { name, value } = e.target;  
@@ -74,23 +94,20 @@ const CompetitionForm: React.FC<Props> = (props) => {
                 }
             }) 
         }         
-    };
-    
+    };    
     //Add new location to competition
     const handleAddLocation = (e: MouseEvent ) => {
         e.preventDefault();
         const lastId = competition.locations.reduce((max, loc) => Math.max(max, loc.id), 0);
         const newId = lastId + 1;    
-        console.log(`Pridavam lokalitu IDLocation: ${newId}`);
-    
+        console.log(`Pridavam lokalitu IDLocation: ${newId}`);    
         setCompetition(prev => {
             return {
                 ...prev,
                 locations: [...prev.locations, {id: newId, group: "", city: "", club: 0}]
             };
         });
-    }
-    
+    };    
     //Remove location from competition
     const handleRemoveLocation = (id: number, e: MouseEvent) => {
         e.preventDefault();
@@ -108,11 +125,6 @@ const CompetitionForm: React.FC<Props> = (props) => {
             };
         });
     } 
-
-    
-
-    
-
     //Handle create competition
     const handleSubmit = (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -122,12 +134,11 @@ const CompetitionForm: React.FC<Props> = (props) => {
             console.log("Vytváram súťaž:"); 
             onCreateCompetition(competition);  
         } else if (buttonName === "edit") {
-            console.log("Upravená súťaž:"); 
+            console.log("Upravujem súťaž:"); 
             onEditCompetition(competition); 
         }        
         onClose();
     };
-
     //Listener for keydown event to close form UI
     // Close form UI on Escape key press
     useEffect(() => {
@@ -136,34 +147,17 @@ const CompetitionForm: React.FC<Props> = (props) => {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
-
-    // Close form UI on component unmount
+    //Set competition data to form UI
+    // Set competition data to form UI when competitionData changes    
     useEffect(() => {
     if (competitionData) {
         console.log("🔁 useEffect competitionData:", competitionData);
         setCompetition(competitionData);
     }
     }, [competitionData]);
-    useEffect(() => {
-        const fetchLeagues = async () => {
-            const leagues = await getLeagues();
-            console.log("🔁 useEffect leagues:", JSON.stringify(leagues));    
-            if (Array.isArray(leagues) && leagues.length > 0) {
-                setLeagues(leagues.map((league) => ({
-                    id: league.id,
-                    name: league.name
-                })));
-            }
-        };
-        const fetchClubs = async () => {
-            const clubs = await getClubs();
-            if(Array.isArray(clubs) && clubs.length > 0) {
-                setClubs(clubs.map((club) => ({
-                    id: club.id,
-                    name: club.name
-                })));
-            }            
-        };        
+    //Fetch leagues and clubs from API
+    // Fetch leagues and clubs from API when component mounts
+    useEffect(() => {        
         fetchLeagues();
         fetchClubs();
     }, []);

@@ -2,7 +2,7 @@ import { useEffect, useState, MouseEvent } from "react";
 //Methods
 import { getCompetitions, createCompetition } from "../../apis/CompetitionApis";
 //Types
-import { Competition, defaultCompetition } from "../../assets/types/competitionTypes";
+import { Competition, defaultCompetition, RawCompetition } from "../../assets/types/competitionTypes";
 import { FormUI } from "../../assets/types/index";
 //Children Components
 import CompetitionForm from "../competitions/CompetitionForm";
@@ -15,33 +15,26 @@ const TheCompetitions: React.FC = () => {
 
     // Fetching all competitions    
     const fetchCompetitions = async () => {
-        const data = await getCompetitions();
-    
+        const data: Competition[] = await getCompetitions();
+        console.log("📦 Raw competitions:", data);
+
         if (Array.isArray(data)) {
-            const grouped: Record<number, Competition> = {};
+            const comps: Competition[] = data.map(comp => ({
+                id: comp.id,
+                league: comp.league, 
+                round: comp.round,
+                date: comp.date,
+                locations: comp.locations.map(loc => ({
+                    id: loc.id,
+                    group: loc.group,
+                    city: loc.city,
+                    club: loc.club 
+                }))
+            }));
+            setCompetitions(comps);
+        }            
+    }       
     
-            data.forEach(row => {
-                const compId = row.cid;    
-                if (!grouped[compId]) {
-                    grouped[compId] = {
-                        id: compId,
-                        league: row.name,
-                        round: row.round,
-                        date: row.date,
-                        locations: []
-                    };
-                }    
-                grouped[compId].locations.push({
-                    id: row.clid,
-                    group: row.group_name,
-                    city: row.city,
-                    club: row.club_id                    
-                });
-            });
-    
-            setCompetitions(Object.values(grouped));
-        }
-    };
 
 
     //Seach competition by id in fetched competitions
