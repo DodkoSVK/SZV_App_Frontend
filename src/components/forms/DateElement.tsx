@@ -100,12 +100,15 @@ const DateElement: React.FC<Props> = (props) => {
     }  
   }
   const handleSelectDay = (day: number) => {
-    console.log(`Den: ${day}`);
-    if(dateInput.current)
-      dateInput.current.value = `${day}.${selectedDate.month + 1}.${selectedDate.year}`;
-    setPersonBirth(`${selectedDate.year}.${selectedDate.month + 1}.${day}`)
-    setSelectingState({...selectingState, date: false})
+    if (dateInput.current)
+      dateInput.current.value = `${day}.${selectedDate.month + 1}.${selectedDate.year}`; // len pre UI
+  
+    const formattedDate = dayjs(new Date(selectedDate.year, selectedDate.month, day)).format("YYYY-MM-DD");
+    setPersonBirth(formattedDate); // posielaj backendu ISO formát
+  
+    setSelectingState({ ...selectingState, date: false });
   }
+  
 
   const getMonthDays = (y: number, m: number) => {
     const startOfMonth = dayjs(new Date(y, m, 1));
@@ -131,9 +134,14 @@ const DateElement: React.FC<Props> = (props) => {
   
 
   useEffect(() => {
-    setDate(elementValue)
-    if (dateInput.current) dateInput.current.value = date;   
-  }, [date]);
+    if (elementValue && dayjs(elementValue).isValid()) {
+      setDate(elementValue);
+      if (dateInput.current) {
+        dateInput.current.value = dayjs(elementValue).format("D.M.YYYY"); // zobraziteľný formát
+      }
+    }
+  }, [elementValue]);
+  
 
   useEffect(() => {
     getMonthDays( selectedDate.year, selectedDate.month );

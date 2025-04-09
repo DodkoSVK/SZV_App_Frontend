@@ -10,6 +10,7 @@ import { ComboboxItem } from "../../assets/types";
 //Methods
 import { getLeagues } from "../../apis/leagueApis";
 import { getClubs } from "../../apis/ClubApis";
+import { toInteger } from "lodash-es";
 
 interface Props {
     formTitle: string;
@@ -92,8 +93,8 @@ const CompetitionForm: React.FC<Props> = (props) => {
                     ...prev,
                     locations: updatedLocations
                 }
-            }) 
-        }         
+            });
+        }     
     };    
     //Add new location to competition
     const handleAddLocation = (e: MouseEvent ) => {
@@ -172,9 +173,10 @@ const CompetitionForm: React.FC<Props> = (props) => {
                         </h1>
                         <form className="space-y-4 md:space-y-6">
                             <InputElement 
-                                inputValue={competition.round}
+                                inputValue={String(competition.round)}
                                 inputLabel="Kolo"
-                                inputName="roundId"                                
+                                inputName="roundId"
+                                handleOnChange={(e) => setCompetition({...competition, round: toInteger(e.target.value)})}                               
                             />                             
                             <ComboBox
                                 comboboxTitle="Liga"

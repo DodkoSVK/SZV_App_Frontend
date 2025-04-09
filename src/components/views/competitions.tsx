@@ -2,7 +2,7 @@ import { useEffect, useState, MouseEvent } from "react";
 //Methods
 import { getCompetitions, createCompetition } from "../../apis/CompetitionApis";
 //Types
-import { Competition, defaultCompetition } from "../../assets/types/competitionTypes";
+import { Competition, CompetitionLocation,defaultCompetition } from "../../assets/types/competitionTypes";
 import { FormUI } from "../../assets/types/index";
 //Children Components
 import CompetitionForm from "../competitions/CompetitionForm";
@@ -17,20 +17,20 @@ const TheCompetitions: React.FC = () => {
     const fetchCompetitions = async () => {
         const data = await getCompetitions();
         console.log("📦 Raw competitions:", data);
-
         if (Array.isArray(data)) {
             const comps: Competition[] = data.map(comp => ({
                 id: comp.id,
-                league: comp.league, 
+                league: comp.league_name, 
                 round: comp.round,
                 date: comp.date,
-                locations: comp.locations.map(loc => ({
+                locations: comp.locations.map((loc: CompetitionLocation) => ({
                     id: loc.id,
                     group: loc.group,
                     city: loc.city,
                     club: loc.club 
                 }))
             }));
+            console.log(`Competitions: ${JSON.stringify(comps)}`)
             setCompetitions(comps);
         }            
     }       

@@ -8,7 +8,7 @@ export interface CompetitionLocation {
 export interface Competition {
     id: number;
     league: string;
-    round: string;
+    round: number | "";
     date: string;
     locations: CompetitionLocation[];
 }
@@ -23,7 +23,7 @@ export const defaultCompetition: Competition = {
     league: "",
     round: "",
     date: "",
-    locations: [defaultCompetitionLocation]
+    locations: []
 }
 
 export interface Leagues {
