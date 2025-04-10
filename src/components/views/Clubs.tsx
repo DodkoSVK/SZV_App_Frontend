@@ -33,7 +33,7 @@ const TheClubs: React.FC = () => {
                 alertMessage: "Klub bol úspešne vytvorený"
             });
             await fetchClubs();
-            setFormUI({ state: false }); 
+            setFormUI({ state: false, formTitle: ""}); 
         } else if (submitStatus === 2) {
             setAlert({
                 alertType: false,
@@ -54,7 +54,7 @@ const TheClubs: React.FC = () => {
                 alertMessage: "Klub bol úspešne upravený"
             });
             await getClubs();
-            setFormUI({ state: false });
+            setFormUI({ state: false, formTitle: "" });
         } else if (updateStatus === 2 ) {
             setAlert({
                 alertType: false,
@@ -72,7 +72,7 @@ const TheClubs: React.FC = () => {
         if ( removeStatus === 1) setAlert({ alertType: true, alertMessage: "Klub úspešne vymazaný." }); 
         else if ( removeStatus === 2) setAlert({ alertType: false, alertMessage: "Nepodarilo sa vymazať klub." });
         fetchClubs();
-        setFormUI({ state: false });
+        setFormUI({ state: false, formTitle: "" });
 
         
     }
@@ -106,7 +106,7 @@ const TheClubs: React.FC = () => {
 
     return(
         <article>
-            <div className="m-8 text-3xl font-bold text-center text-[#F7F9FB] uppercase">
+            <div className="m-8 text-3xl mx-10 font-bold text-left text-[#F7F9FB] uppercase">
                 <h1>Športové kluby SZV</h1>
             </div>
             <ClubsTable 

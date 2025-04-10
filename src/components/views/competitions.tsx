@@ -8,6 +8,9 @@ import { FormUI } from "../../assets/types/index";
 import CompetitionForm from "../competitions/CompetitionForm";
 import ContentBlock from "../contentBlock/ContentBlock";
 
+
+import { Button } from "@/components/ui/button"
+
 const TheCompetitions: React.FC = () => {
     const [competitions, setCompetitions] = useState<Competition[] | { message: string }>({ message: "Načítavam súťaže..." });    
     const [editingCompetition, setEditingCompetition] = useState<Competition>(defaultCompetition);
@@ -98,7 +101,7 @@ const TheCompetitions: React.FC = () => {
     }, []);
     
     return (
-        <article>
+        <article>            
             <div className="m-8 text-3xl font-bold text-center text-[#F7F9FB] uppercase">
                 <h1>Súťaže SZV</h1>
                 <button onClick={() => setFormUiData({ state: true, formTitle: "Vytvorenie súťaže" })}>
@@ -106,8 +109,12 @@ const TheCompetitions: React.FC = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                     </svg>
                 </button>
-
             </div>
+
+            <div className="flex flex-col items-center justify-center min-h-svh">
+                <Button>Click me</Button>
+            </div>
+
             {Array.isArray(competitions) && competitions.length > 0 ? (
                 competitions.map(competition => (
                     <ContentBlock 
