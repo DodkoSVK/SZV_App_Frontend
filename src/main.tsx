@@ -2,13 +2,13 @@ import React from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App.tsx"
 import "./assets/styles.css"
-import { ThemeProvider } from "./assets/types/components/theme-provider.tsx"
-import { BrowserRouter } from "react-router-dom" // ⬅️ toto pridaj
+import { ThemeProvider } from "./components/ThemeProvider.tsx"
+import { BrowserRouter } from "react-router-dom"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter> {/* ⬅️ obalíme aplikáciu */}
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <BrowserRouter>
+      <ThemeProvider>
         <App />
       </ThemeProvider>
     </BrowserRouter>

@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
+import { useTheme } from "@/components/ThemeProvider"
 
 const ThemeToggle: React.FC = () => {
   const { theme, setTheme } = useTheme()
@@ -14,7 +14,7 @@ const ThemeToggle: React.FC = () => {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="transition-transform hover:scale-110"
+      className="transition-transform hover:scale-110 relative"
       aria-label="Prepni tému"
     >
       {/* Sun icon */}

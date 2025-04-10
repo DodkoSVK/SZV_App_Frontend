@@ -10,10 +10,13 @@ import FailedAlert from '../../components/alerts/FailedAlert';
 import ClubsTable from '../clubs/ClubsTable';
 import ClubForm from '../clubs/ClubForm';
 
+import ClubTableColumns from '../tables/ClubTableColumns';
+import DataTable from '../tables/DataTable';
+
 // Component
 const TheClubs: React.FC = () => {
     //useStates
-    const [clubs, setClubs] = useState<Club[] | { message: string }>( { message: "Načítavam kluby..." });
+    const [clubs, setClubs] = useState<Club[]>([]);
     const [editingClub, setEditingClub] = useState<Club>();
     const [formUI, setFormUI] = useState<FormUI | null>(null);    
     const [alert, setAlert] = useState<Alert | null>(null);
@@ -109,11 +112,19 @@ const TheClubs: React.FC = () => {
             <div className="m-8 text-3xl mx-10 font-bold text-left text-[#F7F9FB] uppercase">
                 <h1>Športové kluby SZV</h1>
             </div>
-            <ClubsTable 
+
+            <div className="mx-10">
+                <DataTable                    
+                    columns={ClubTableColumns}
+                    data={clubs}
+                />
+            </div>
+
+            {/* <ClubsTable 
                 clubs={clubs} 
                 sortBy={(key: string) => fetchSortedClubs(key)}
                 uiHandler={(clubId: number) => handleOpenFormUI(clubId)}
-            />
+            /> */}
             { formUI?.state && (
                 <ClubForm 
                     clubData={editingClub}

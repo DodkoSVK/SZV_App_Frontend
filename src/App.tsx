@@ -9,7 +9,7 @@ import Home from './components/views/Home';
 
 function App() {
   return (
-    <div className="App bg-background text-foreground min-h-screen p-4 transition-colors">
+    <div className="App bg-secondary/50 text-foreground min-h-screen p-4 transition-colors">
       <header>
         <TheNavigation />
       </header>
