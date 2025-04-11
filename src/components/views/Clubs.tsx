@@ -12,6 +12,7 @@ import ClubForm from '../clubs/ClubForm';
 
 import ClubTableColumns from '../tables/ClubTableColumns';
 import DataTable from '../tables/DataTable';
+import { Button } from "@/components/ui/button"
 
 // Component
 const TheClubs: React.FC = () => {
@@ -109,8 +110,13 @@ const TheClubs: React.FC = () => {
 
     return(
         <article>
-            <div className="m-8 text-3xl mx-10 font-bold text-left text-[#F7F9FB] uppercase">
+            <div className="flex flex-row justify-between m-8 text-3xl mx-20 font-bold text-left text-[oklch(var(--foreground))] uppercase">
                 <h1>Športové kluby SZV</h1>
+                <div className="flex flex-row gap-2">                  
+                    <Button variant="red">Vymazať</Button>
+                    <Button variant="orange">Upraviť</Button>
+                    <Button variant="green">Pridať</Button>
+                </div>                
             </div>
 
             <div className="mx-10">

@@ -132,7 +132,7 @@ function NavigationMenuLink({
         "hover:bg-primary hover:text-white",
         "focus:bg-primary focus:text-white",
         "[aria-current=page]:bg-primary [aria-current=page]:text-white",
-        "flex flex-col gap-1 rounded-sm p-2 text-sm transition-all outline-none",
+        "flex flex-col gap-1 rounded-sm p-2 text-lg transition-all outline-none",
         "focus-visible:ring-[3px] focus-visible:outline-1 focus-visible:ring-ring/50",
         "[&_svg:not([class*='text-'])]:text-muted-foreground",
         "[&_svg:not([class*='size-'])]:size-4",

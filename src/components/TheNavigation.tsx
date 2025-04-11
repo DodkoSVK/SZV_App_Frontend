@@ -5,9 +5,7 @@ import {
     NavigationMenuLink,
     NavigationMenuList,
 } from "@/components/ui/navigation-menu"
-import { cn } from "@/lib/utils";  
 import ThemeToggle from "./ThemeToggle";
-import { isAbsolute } from "path";
 
 const TheNavigation: React.FC = () => {
     return (   
@@ -23,14 +21,11 @@ const TheNavigation: React.FC = () => {
                 </NavLink>
 
                 <NavigationMenu>
-                    <NavigationMenuList className="flex items-center gap-4 text-lg font-semibold">
+                    <NavigationMenuList className="flex items-center gap-4 font-bold">
                         <NavigationMenuItem>
                             
                             <NavigationMenuLink asChild>
-                                <NavLink
-                                    to="/"
-                                    className="font-bold"                                    
-                                >
+                                <NavLink to="/">
                                     Domov
                                 </NavLink>
                             </NavigationMenuLink>
@@ -38,15 +33,7 @@ const TheNavigation: React.FC = () => {
 
                         <NavigationMenuItem>
                             <NavigationMenuLink asChild>
-                                <NavLink
-                                    to="/clubs"
-                                    className={({ isActive}) =>
-                                        cn(
-                                            "transition-colors hover:text-primary",
-                                            isActive ? "text-primary underline" : "text-muted-foreground"  
-                                            )
-                                    }   
-                                >
+                                <NavLink to="/clubs">
                                     Kluby
                                 </NavLink>
                             </NavigationMenuLink>
@@ -54,15 +41,7 @@ const TheNavigation: React.FC = () => {
 
                         <NavigationMenuItem>
                             <NavigationMenuLink asChild>
-                                <NavLink
-                                    to="/persons"
-                                    className={({ isActive}) =>
-                                        cn(
-                                            "transition-colors hover:text-primary",
-                                            isActive ? "text-primary underline" : "text-muted-foreground"  
-                                            )
-                                    }                                  
-                                    >
+                                <NavLink to="/persons">                                   
                                     Ľudia
                                 </NavLink>
                             </NavigationMenuLink>
@@ -70,15 +49,7 @@ const TheNavigation: React.FC = () => {
 
                         <NavigationMenuItem>
                             <NavigationMenuLink asChild>
-                                <NavLink
-                                    to="/competitions"
-                                    className={({ isActive}) =>
-                                        cn(
-                                            "transition-colors hover:text-primary",
-                                            isActive ? "text-primary underline" : "text-muted-foreground"  
-                                            )
-                                    }
-                                >
+                                <NavLink to="/competitions">
                                     Súťaže
                                 </NavLink>
                             </NavigationMenuLink>
@@ -90,7 +61,7 @@ const TheNavigation: React.FC = () => {
 
 
                 <div className="flex items-center gap-4">
-                    <button className="rounded-md border border-input px-3 py-1.5 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
+                    <button className="rounded-md border border-input px-3 py-1.5 text-sm font-medium transition-colors hover:bg-primary hover:text-accent-foreground">
                         Prihlásiť
                     </button>
                     <ThemeToggle />

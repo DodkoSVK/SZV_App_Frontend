@@ -14,7 +14,11 @@ const ThemeToggle: React.FC = () => {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="transition-transform hover:scale-110 relative"
+      className="
+        transition-transform hover:scale-110 relative
+        hover:bg-primary hover:text-accent
+        dark:hover:bg-primary  dark:hover:text-white
+        "
       aria-label="Prepni tému"
     >
       {/* Sun icon */}
