@@ -16,15 +16,16 @@ import {
     TableHeader,
     TableRow,
     } from "@/components/ui/table"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
+    onRowSelect: (ids: number[]) => void;
     }
 
-const DataTable = <TData, TValue>({ columns, data}: DataTableProps<TData, TValue>): React.ReactElement => {
+const DataTable = <TData, TValue>({ columns, data, onRowSelect}: DataTableProps<TData, TValue>): React.ReactElement => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [rowSelection, setRowSelection] = useState({})
@@ -43,6 +44,13 @@ const DataTable = <TData, TValue>({ columns, data}: DataTableProps<TData, TValue
             rowSelection,
         },
     });
+
+    useEffect(() => {
+        const selectedRowIndex = Object.keys(rowSelection);
+        const selectedIndexes = selectedRowIndex.map(index => data[index]?.id);
+        console.log(`Vybrane IDcko: ${selectedIndexes}`)
+        onRowSelect(selectedIndexes);
+    }, [rowSelection, data]);
     return (
         <div>
             <div className="flex items-center py-4">
@@ -54,6 +62,11 @@ const DataTable = <TData, TValue>({ columns, data}: DataTableProps<TData, TValue
                 }
                 className="max-w-sm"
             />
+            <div className="flex-1 text-sm pl-2 text-muted-foreground">
+                {table.getFilteredSelectedRowModel().rows.length} z{" "}
+                {table.getFilteredRowModel().rows.length} vybraných.
+            </div>
+
             </div>
             <div className="rounded-md border">   
                 <Table>

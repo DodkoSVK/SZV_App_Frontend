@@ -21,6 +21,9 @@ const TheClubs: React.FC = () => {
     const [editingClub, setEditingClub] = useState<Club>();
     const [formUI, setFormUI] = useState<FormUI | null>(null);    
     const [alert, setAlert] = useState<Alert | null>(null);
+    const [selecting, setSelecting] = useState<boolean>(false);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    
 
     // Fetching all clubs
     const fetchClubs = async () => {
@@ -104,25 +107,50 @@ const TheClubs: React.FC = () => {
     const handleCloseAlert = () => {
         setAlert(null);
     };
+
+    const handleRowSelect = (ids: number[]) => {
+        setSelectedIds(ids);
+        setSelecting(ids.length > 0);
+    }
+
     useEffect(() => {   
         fetchClubs();
     }, []);
 
     return(
         <article>
-            <div className="flex flex-row justify-between m-8 text-3xl mx-20 font-bold text-left text-[oklch(var(--foreground))] uppercase">
+            <div className="flex flex-row justify-between mt-4 text-3xl mx-20 font-bold text-left text-[oklch(var(--foreground))] uppercase">
                 <h1>Športové kluby SZV</h1>
-                <div className="flex flex-row gap-2">                  
-                    <Button variant="red">Vymazať</Button>
-                    <Button variant="orange">Upraviť</Button>
-                    <Button variant="green">Pridať</Button>
+                <div className="flex flex-row gap-2">   
+                    { selecting && (
+                        <>
+                            <Button 
+                                variant="red"
+                                onClick={() => console.log("Delete")}
+                            >
+                                Vymazať
+                            </Button>
+                            <Button 
+                                variant="orange"
+                                onClick={() => console.log("Edit")}
+                            >
+                                Upraviť
+                            </Button>
+                        </>                                                
+                    )}            
+                    <Button 
+                        variant="green"
+                        onClick={() => handleOpenFormUI(0)}
+                    >
+                        Pridať
+                    </Button>
                 </div>                
             </div>
-
             <div className="mx-10">
                 <DataTable                    
                     columns={ClubTableColumns}
                     data={clubs}
+                    onRowSelect={handleRowSelect}
                 />
             </div>
 
