@@ -18,14 +18,16 @@ import {
     } from "@/components/ui/table"
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
+import { NumericKeys } from "node_modules/react-hook-form/dist/types/path/common"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
-    data: TData[]
+    data: TData[] 
     onRowSelect: (ids: number[]) => void;
+    tableRef?: React.MutableRefObject<any>; 
     }
 
-const DataTable = <TData, TValue>({ columns, data, onRowSelect}: DataTableProps<TData, TValue>): React.ReactElement => {
+const DataTable = <TData, TValue>({ columns, data, onRowSelect, tableRef}: DataTableProps<TData, TValue>): React.ReactElement => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [rowSelection, setRowSelection] = useState({})
@@ -42,8 +44,11 @@ const DataTable = <TData, TValue>({ columns, data, onRowSelect}: DataTableProps<
             sorting,
             columnFilters,
             rowSelection,
-        },
+        },        
     });
+    if (tableRef) {
+        tableRef.current = table;
+    }
 
     useEffect(() => {
         const selectedRowIndex = Object.keys(rowSelection);
@@ -51,6 +56,7 @@ const DataTable = <TData, TValue>({ columns, data, onRowSelect}: DataTableProps<
         console.log(`Vybrane IDcko: ${selectedIndexes}`)
         onRowSelect(selectedIndexes);
     }, [rowSelection, data]);
+   
     return (
         <div>
             <div className="flex items-center py-4">

@@ -22,7 +22,7 @@ interface Props {
     deletePerson: (personId: number) => void;
 }
 
-const PersonForm: React.FC<Props> = (props) => {
+const PersonFormOld: React.FC<Props> = (props) => {
     const [greenButton, setGreenButton] = useState<Button>();
     const [person, setPerson] = useState<Person>(defaultPerson);
     const [clubs, setClubs] = useState<Club[] | { message: string }>([]);
@@ -139,4 +139,4 @@ const PersonForm: React.FC<Props> = (props) => {
         </section>
     );
 };
-export default PersonForm;
+export default PersonFormOld;

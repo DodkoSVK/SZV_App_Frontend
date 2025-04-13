@@ -7,7 +7,7 @@ import { Button } from "../../assets/types";
 import RedButton from "../buttons/RedButton";
 import GreenButton from "../buttons/GreenButton";
 import YellowButton from "../buttons/OrangeButton";
-import ComboBox from "../forms/ComboBox";
+import ComboBox from "../forms/ComboBoxOld";
 
 /**
  * closeCreateClubUI -> Closing form UI

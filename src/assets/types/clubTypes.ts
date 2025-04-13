@@ -1,14 +1,16 @@
 import { z } from "zod";
 
 export const baseClubSchema = z.object({
+    id: z.number(),
     name: z.string().min(1, "Názov klubu je povinný údaj"),
     city: z.string().min(1, "Mesto je povinný údaj"),
     street: z.string().min(1, "Ulica je povinný údaj"),
     postal: z.string().min(1, "PSČ je povinný údaj"),
     ico: z.string().min(1, "IČO je povinný údaj"),
     tel: z.string().optional(),
-    mail: z.string().email("Neplatný email").optional()
-})
+    mail: z.string().email("Neplatný email").or(z.literal("")).optional(),
+    chairman: z.union([z.number().min(1, "Vyberte iného štatutáta"), z.literal(0)]).optional()
+});
 //Club type with optional fields
 export const editClubSchema = baseClubSchema.partial();
 export type EditClub = z.infer<typeof editClubSchema>;

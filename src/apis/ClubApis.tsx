@@ -20,7 +20,7 @@ export const getClubs = async () => {
         return { message: "Chyba pri získavaní klubov" }; 
     });
 };
-
+//TO DELETE **************************************** TO DELETE ****************************************
 //Getting sorted clubs from DB
 export const getSortedClubs = async (key: string) => {    
     console.log(`🟡 Filtrujem všetky kluby podľa: ${key}`);
@@ -39,6 +39,8 @@ export const getSortedClubs = async (key: string) => {
         return { message: "Chyba pri získavaní klubov" };
     });
 };
+//TO DELETE **************************************** TO DELETE ****************************************
+
 //Put new club to DB
 export const createClub = async (club: CreateClub) => {
     console.log("🟡 Vytváram klub s týmito údajmi: ", club);
