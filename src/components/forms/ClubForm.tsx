@@ -46,7 +46,8 @@ interface Props {
 
 const ClubForm: React.FC<Props> = (props) => {
     const { formTitle, clubData, handleCloseUI, onCreate, onEdit} = props;
-    const [ selectedData, setSelectedData ] = useState<number>(0)
+    const [ selectedData, setSelectedData ] = useState<number>(0);
+    const [ localClubData, setLocalClubData ] = useState<CreateClub[]>([]);
     const [comboboxPeople, setComboBoxPeople] = useState<ComboboxItem[]>([]);
     const form = useForm<CreateClub>({
         resolver: zodResolver(createClubSchema),
@@ -79,13 +80,20 @@ const ClubForm: React.FC<Props> = (props) => {
         
         
     }
-    const onSubmit = (data: CreateClub) => {
-        if (clubData) {
+    const onSubmit = async (data: CreateClub) => {
+        if (localClubData.length > 0) {
             console.log(`Upravujem klub:`, data);
-            onEdit?.(data);          
-            if (selectedData < clubData.length - 1) {
-                setSelectedData((prev) => prev + 1);
-            } else {                
+            await onEdit?.(data);                      
+
+            const updatedClubData = [...localClubData];
+            updatedClubData.splice(selectedData, 1);
+            setLocalClubData(updatedClubData);
+            console.log(`Updated clubs: ${JSON.stringify(updatedClubData)}`);
+        
+            if (updatedClubData.length > 0) {
+                setSelectedData((prev) => Math.min(prev, updatedClubData.length - 1));
+                form.reset(updatedClubData[Math.min(selectedData, updatedClubData.length - 1)]);
+            } else { 
                 handleCloseUI();
             }
         } else {
@@ -115,11 +123,16 @@ const ClubForm: React.FC<Props> = (props) => {
             document.removeEventListener('keydown', handleKeyDown);
         };
     }, []);
+
     useEffect(() => {
         if (clubData && clubData[selectedData]) {
             form.reset(clubData[selectedData]);
         }
     }, [selectedData, clubData]);
+
+    useEffect(() => {
+        setLocalClubData(clubData ?? []);
+    }, [clubData])
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-filter backdrop-blur-xs">       
             <Card className="w-full max-w-md">
@@ -281,14 +294,14 @@ const ClubForm: React.FC<Props> = (props) => {
                                 </PaginationItem>
                                 <PaginationItem>
                                     <div className="px-3 py-1 text-sm">
-                                        {selectedData + 1} / {clubData.length}
+                                        {selectedData + 1} / {localClubData.length}
                                     </div>
                                 </PaginationItem>
                                 <PaginationItem>
                                     <PaginationNext
                                         onClick={() =>
                                             setSelectedData((prev) =>
-                                            Math.min(prev + 1, clubData.length - 1)
+                                            Math.min(prev + 1, localClubData.length - 1)
                                             )
                                         }
                                         label="Ďalej"
