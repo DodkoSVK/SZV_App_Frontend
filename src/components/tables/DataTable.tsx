@@ -16,9 +16,8 @@ import {
     TableHeader,
     TableRow,
     } from "@/components/ui/table"
-import { useEffect, useState } from "react"
-import { Input } from "@/components/ui/input"
-import { NumericKeys } from "node_modules/react-hook-form/dist/types/path/common"
+import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]

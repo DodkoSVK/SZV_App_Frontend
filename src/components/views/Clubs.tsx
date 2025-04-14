@@ -75,14 +75,23 @@ const TheClubs: React.FC = () => {
             });
         }
     }
-    const removeClub = async (clubId: number) => {
-        const removeStatus = await deleteClub(clubId);
-        if ( removeStatus === 1) setAlert({ alertType: true, alertMessage: "Klub úspešne vymazaný." }); 
-        else if ( removeStatus === 2) setAlert({ alertType: false, alertMessage: "Nepodarilo sa vymazať klub." });
-        fetchClubs();
-        setFormUI({ state: false, formTitle: "" });
-
+    const removeClub = async () => {
+        let howmuch = 0;
+        for (const selectedId of selectedIds) {
+            const removeStatus = await deleteClub(selectedId);
+            if ( removeStatus === 2) {
+                setAlert({ alertType: false, alertMessage: "Nepodarilo sa vymazať klub." });
+                break;
+            } 
+            howmuch++;
+        }
+        if( howmuch > 1)
+            setAlert({ alertType: true, alertMessage: `Bolo úspešne vymazaných ${howmuch} klubov.` });
+        else
+            setAlert({ alertType: true, alertMessage: "Klub úspešne vymazaný." }); 
         
+        getClubs();       
+        handleCloseFormUI();        
     } 
     
     const handleCloseAlert = () => {
@@ -146,7 +155,7 @@ const TheClubs: React.FC = () => {
                         <>
                             <Button 
                                 variant="red"
-                                onClick={() => console.log("Delete")}
+                                onClick={() => removeClub()}
                             >
                                 Vymazať
                             </Button>

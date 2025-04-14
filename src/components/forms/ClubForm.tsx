@@ -63,7 +63,7 @@ const ClubForm: React.FC<Props> = (props) => {
             chairman: 0
         },
     });
-    const isEdit = !!clubData;
+    const isEdit = (clubData?.[selectedData]?.id ?? 0) > 0;
     const submitButtonLabel = isEdit ? "Upraviť" : "Vytvoriť";
     const submitButtonVariant = isEdit ? "orange" : "green";
 

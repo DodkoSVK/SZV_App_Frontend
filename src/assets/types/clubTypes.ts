@@ -3,7 +3,7 @@ import { z } from "zod";
 export const baseClubSchema = z.object({
     id: z.number(),
     name: z.string().min(1, "Názov klubu je povinný údaj"),
-    city: z.string().min(1, "Mesto je povinný údaj"),
+    city: z.string().min(1, "Mesto je povinný údaj"),               
     street: z.string().min(1, "Ulica je povinný údaj"),
     postal: z.string().min(1, "PSČ je povinný údaj"),
     ico: z.string().min(1, "IČO je povinný údaj"),
@@ -33,8 +33,6 @@ export interface Club {
     sname: string
 };
 
-
- 
 //Club interface with initial values
 export const defaultClub: Club = {
     id: 0,
