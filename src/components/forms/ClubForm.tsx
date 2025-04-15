@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useEffect, useState, MouseEvent } from "react";
+import { useEffect, useState, MouseEvent, FormEvent } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 //Form components
@@ -29,43 +29,37 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import ComboBox from "./ComboBox";
 //Schemas
-import { createClubSchema } from "@/assets/types/clubTypes";
+import { createClubSchema, CreateClub, editClubSchema, EditClub, defaultableClubSchema, DefaultClub, Club, ClubFormValues} from "@/assets/types/clubTypes";
 //Methods
 import { getPersons } from "@/apis/PersonApis";
 import { ComboboxItem } from "@/assets/types";
 
-type CreateClub = z.infer<typeof createClubSchema>;
 
 interface Props {
     formTitle: string
-    clubData?: CreateClub[]
+    clubData?: Club[];
     handleCloseUI: () => void
     onCreate?: (club: CreateClub) => void;
-    onEdit?: (club: CreateClub) => void;
+    onEdit?: (club: EditClub) => void;
 }
 
 const ClubForm: React.FC<Props> = (props) => {
     const { formTitle, clubData, handleCloseUI, onCreate, onEdit} = props;
+    const [ localClubData, setLocalClubData ] = useState<Club[]>([]);
+
+
     const [ selectedData, setSelectedData ] = useState<number>(0);
-    const [ localClubData, setLocalClubData ] = useState<CreateClub[]>([]);
+   
     const [comboboxPeople, setComboBoxPeople] = useState<ComboboxItem[]>([]);
-    const form = useForm<CreateClub>({
-        resolver: zodResolver(createClubSchema),
-        defaultValues: clubData?.[selectedData] || {
-            id: 0,
-            name: "",
-            city: "",
-            street: "",
-            postal: "",
-            ico: "",
-            tel: "",
-            mail: "",
-            chairman: 0
-        },
+    const form = useForm<ClubFormValues>({
+        resolver: zodResolver(defaultableClubSchema),
+        defaultValues: clubData?.[selectedData] ?? defaultableClubSchema.parse({}),
     });
-    const isEdit = (clubData?.[selectedData]?.id ?? 0) > 0;
+    
+    const isEdit = !!localClubData?.[selectedData];
     const submitButtonLabel = isEdit ? "Upraviť" : "Vytvoriť";
     const submitButtonVariant = isEdit ? "orange" : "green";
+    const submitButtonName = isEdit ? "update" : "create";
 
     const fetchPersons = async () => {
         const people = await getPersons();
@@ -80,28 +74,49 @@ const ClubForm: React.FC<Props> = (props) => {
         
         
     }
-    const onSubmit = async (data: CreateClub) => {
-        if (localClubData.length > 0) {
-            console.log(`Upravujem klub:`, data);
-            await onEdit?.(data);                      
+    const onSubmit = async (data: CreateClub, e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-            const updatedClubData = [...localClubData];
-            updatedClubData.splice(selectedData, 1);
-            setLocalClubData(updatedClubData);
-            console.log(`Updated clubs: ${JSON.stringify(updatedClubData)}`);
-        
-            if (updatedClubData.length > 0) {
-                setSelectedData((prev) => Math.min(prev, updatedClubData.length - 1));
-                form.reset(updatedClubData[Math.min(selectedData, updatedClubData.length - 1)]);
-            } else { 
-                handleCloseUI();
-            }
-        } else {
+        const formButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
+        const action = formButton.name;
+
+        if(action === "create") {
             console.log(`Vytváram klub:`, data);
-            onCreate?.(data);
+            const createClubData = {
+                name: data.name,
+                city: data.city,
+                street: data.street,
+                postal: data.postal,
+                ico: data.ico,
+                tel: data.tel,
+                mail: data.mail,
+                chairman: data.chairman
+            };
+            await onCreate?.(createClubData);
+            handleCloseUI();
+        } else if (action === "update") {
+            if (localClubData.length > 0) {
+                console.log(`Upravujem klub:`, data);
+                
+                await onEdit?.(data);                      
+    
+                const updatedClubData = [...localClubData];
+                updatedClubData.splice(selectedData, 1);
+                setLocalClubData(updatedClubData);
+                console.log(`Updated clubs: ${JSON.stringify(updatedClubData)}`);
+            
+                if (updatedClubData.length > 0) {
+                    setSelectedData((prev) => Math.min(prev, updatedClubData.length - 1));
+                    form.reset(updatedClubData[Math.min(selectedData, updatedClubData.length - 1)]);
+                } else { 
+                    handleCloseUI();
+                }
+            }
+        } else if (action === "cancel") {
             handleCloseUI();
         }
-    };
+
+    }
 
 
     const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
@@ -131,8 +146,9 @@ const ClubForm: React.FC<Props> = (props) => {
     }, [selectedData, clubData]);
 
     useEffect(() => {
+        console.log(`Citam poslane data a ukladam do mojeho useState`)
         setLocalClubData(clubData ?? []);
-    }, [clubData])
+    }, [clubData]);
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-filter backdrop-blur-xs">       
             <Card className="w-full max-w-md">
@@ -141,7 +157,7 @@ const ClubForm: React.FC<Props> = (props) => {
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit((e) => onSubmit(e))} className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="name"
@@ -266,12 +282,13 @@ const ClubForm: React.FC<Props> = (props) => {
                                 <Button 
                                     variant={submitButtonVariant}
                                     type="submit"
+                                    name={submitButtonName}                               
                                 >
                                     {submitButtonLabel}
                                 </Button> 
                                 <Button
                                     variant="red"
-                                    onClick={handleCloseUI}
+                                    name="cancel"
                                 >
                                     Zrušiť
                                 </Button>

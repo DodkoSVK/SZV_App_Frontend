@@ -11,13 +11,30 @@ export const baseClubSchema = z.object({
     mail: z.string().email("Neplatný email").or(z.literal("")).optional(),
     chairman: z.union([z.number().min(1, "Vyberte iného štatutáta"), z.literal(0)]).optional()
 });
+
 //Club type with optional fields
 export const editClubSchema = baseClubSchema.partial();
 export type EditClub = z.infer<typeof editClubSchema>;
 //Club type without any options
-export const createClubSchema = baseClubSchema;
+export const createClubSchema = baseClubSchema.partial({ id: true });
 export type CreateClub = z.infer<typeof createClubSchema>;
 
+export const defaultableClubSchema = z.object({
+    id: z.number().default(0),
+    name: z.string().default(""),
+    city: z.string().default(""),
+    street: z.string().default(""),
+    postal: z.string().default(""),
+    ico: z.string().default(""),
+    tel: z.string().default(""),
+    mail: z.string().default(""),
+    chairman: z.number().default(0)
+});
+export type DefaultClub = z.infer<typeof defaultableClubSchema>;
+export type ClubFormValues = z.infer<typeof defaultableClubSchema>;
+
+
+// TO DELETE ****************************************? MAYBE
 //Club interface
 export interface Club {
     id: number
