@@ -29,14 +29,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import ComboBox from "./ComboBox";
 //Schemas
-import { createClubSchema, CreateClub, editClubSchema, EditClub, defaultableClubSchema, DefaultClub, Club, ClubFormValues} from "@/assets/types/clubTypes";
+import { CreateClub, EditClub, defaultableClubSchema, DefaultClub, Club} from "@/assets/types/clubTypes";
 //Methods
 import { getPersons } from "@/apis/PersonApis";
 import { ComboboxItem } from "@/assets/types";
 
 
 interface Props {
-    formTitle: string
     clubData?: Club[];
     handleCloseUI: () => void
     onCreate?: (club: CreateClub) => void;
@@ -44,14 +43,14 @@ interface Props {
 }
 
 const ClubForm: React.FC<Props> = (props) => {
-    const { formTitle, clubData, handleCloseUI, onCreate, onEdit} = props;
+    const { clubData, handleCloseUI, onCreate, onEdit } = props;
     const [ localClubData, setLocalClubData ] = useState<Club[]>([]);
 
 
     const [ selectedData, setSelectedData ] = useState<number>(0);
-   
-    const [comboboxPeople, setComboBoxPeople] = useState<ComboboxItem[]>([]);
-    const form = useForm<ClubFormValues>({
+    const [ comboboxPeople, setComboBoxPeople ] = useState<ComboboxItem[]>([]);
+
+    const form = useForm<DefaultClub>({
         resolver: zodResolver(defaultableClubSchema),
         defaultValues: clubData?.[selectedData] ?? defaultableClubSchema.parse({}),
     });
@@ -60,6 +59,7 @@ const ClubForm: React.FC<Props> = (props) => {
     const submitButtonLabel = isEdit ? "Upraviť" : "Vytvoriť";
     const submitButtonVariant = isEdit ? "orange" : "green";
     const submitButtonName = isEdit ? "update" : "create";
+    const formTitle = isEdit ? "Upraviť klub" : "Vytvoriť klub";
 
     const fetchPersons = async () => {
         const people = await getPersons();
@@ -74,15 +74,10 @@ const ClubForm: React.FC<Props> = (props) => {
         
         
     }
-    const onSubmit = async (data: CreateClub, e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        const formButton = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement;
-        const action = formButton.name;
-
-        if(action === "create") {
+    const onSubmit = async (data: Club) => {
+        if( data.id === 0 ) {
             console.log(`Vytváram klub:`, data);
-            const createClubData = {
+            const createClubData: CreateClub = {
                 name: data.name,
                 city: data.city,
                 street: data.street,
@@ -90,32 +85,25 @@ const ClubForm: React.FC<Props> = (props) => {
                 ico: data.ico,
                 tel: data.tel,
                 mail: data.mail,
-                chairman: data.chairman
+                chairman: data.chid
             };
             await onCreate?.(createClubData);
             handleCloseUI();
-        } else if (action === "update") {
-            if (localClubData.length > 0) {
-                console.log(`Upravujem klub:`, data);
-                
-                await onEdit?.(data);                      
-    
-                const updatedClubData = [...localClubData];
-                updatedClubData.splice(selectedData, 1);
-                setLocalClubData(updatedClubData);
-                console.log(`Updated clubs: ${JSON.stringify(updatedClubData)}`);
-            
-                if (updatedClubData.length > 0) {
-                    setSelectedData((prev) => Math.min(prev, updatedClubData.length - 1));
-                    form.reset(updatedClubData[Math.min(selectedData, updatedClubData.length - 1)]);
-                } else { 
-                    handleCloseUI();
-                }
+        } else {
+            console.log(`Upravujem klub:`, data);
+            await onEdit?.(data);
+            const updatedClubData = [...localClubData];
+            updatedClubData.splice(selectedData, 1);
+            setLocalClubData(updatedClubData);
+            console.log(`Updated clubs: ${JSON.stringify(updatedClubData)}`);
+        
+            if (updatedClubData.length > 0) {
+                setSelectedData((prev) => Math.min(prev, updatedClubData.length - 1));
+                form.reset(updatedClubData[Math.min(selectedData, updatedClubData.length - 1)]);
+            } else { 
+                handleCloseUI();
             }
-        } else if (action === "cancel") {
-            handleCloseUI();
         }
-
     }
 
 
@@ -289,6 +277,7 @@ const ClubForm: React.FC<Props> = (props) => {
                                 <Button
                                     variant="red"
                                     name="cancel"
+                                    onClick={handleCancelButton}
                                 >
                                     Zrušiť
                                 </Button>
@@ -296,7 +285,7 @@ const ClubForm: React.FC<Props> = (props) => {
                         </form>
                     </Form>
                 </CardContent> 
-                { clubData && clubData.length > 0 && (
+                { localClubData && localClubData.length > 0 && (
                     <CardFooter>
                         <Pagination>
                             <PaginationContent>

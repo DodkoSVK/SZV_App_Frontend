@@ -30,8 +30,7 @@ export const defaultableClubSchema = z.object({
     mail: z.string().default(""),
     chairman: z.number().default(0)
 });
-export type DefaultClub = z.infer<typeof defaultableClubSchema>;
-export type ClubFormValues = z.infer<typeof defaultableClubSchema>;
+export type DefaultClub = z.input<typeof defaultableClubSchema>;
 
 
 // TO DELETE ****************************************? MAYBE

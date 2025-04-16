@@ -18,7 +18,7 @@ const TheClubs: React.FC = () => {
     //useStates
     const [clubs, setClubs] = useState<Club[]>([]);
     const [editingClub, setEditingClub] = useState<Club[]>([]);
-    const [formUI, setFormUI] = useState<FormUI | null>(null);    
+    const [formUI, setFormUI] = useState<boolean>(false);    
     const [alert, setAlert] = useState<Alert | null>(null);
     const [selecting, setSelecting] = useState<boolean>(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -26,7 +26,7 @@ const TheClubs: React.FC = () => {
     const tableRef = useRef<any>(null);
 
 
-    const showForm = formUI?.state && (formUI.formTitle === "Vytvoriť nový klub" || editingClub.length > 0);
+    
     // Fetching all clubs
     const fetchClubs = async () => {
         const results = await getClubs();
@@ -41,7 +41,7 @@ const TheClubs: React.FC = () => {
                 alertMessage: "Klub bol úspešne vytvorený"
             });
             await fetchClubs();
-            setFormUI({ state: false, formTitle: ""}); 
+            setFormUI(false); 
         } else if (submitStatus === 2) {
             setAlert({
                 alertType: false,
@@ -113,10 +113,10 @@ const TheClubs: React.FC = () => {
     // Handle open Form UI
     const handleOpenFormUI = () => { 
         if(selectedIds.length === 0) {
-            setFormUI({ state: true, formTitle: "Vytvoriť nový klub" });    
+            setFormUI(true);    
         } else {
             findClubByID(selectedIds);            
-            setFormUI({ state: true, formTitle: "Upraviť klub" }); 
+            setFormUI(true);
         }                     
     };  
     //Find Club(s) in fetched clubs  - DONE
@@ -130,7 +130,10 @@ const TheClubs: React.FC = () => {
     //Handle close Form UI  - DONE
     const handleCloseFormUI = () => {
         fetchClubs();
-        setFormUI({state: false, formTitle: ""});
+        setFormUI(false);
+        setSelecting(false);
+        setSelectedIds([]);
+        setEditingClub([]);
         tableRef.current?.resetRowSelection();
     }
 
@@ -183,9 +186,8 @@ const TheClubs: React.FC = () => {
                     tableRef={tableRef}
                 />
             </div>        
-            { showForm && (
-                <ClubForm
-                    formTitle={formUI.formTitle}
+            { formUI && (
+                <ClubForm                    
                     clubData={editingClub}
                     handleCloseUI={handleCloseFormUI}
                     onCreate={submitClub}
