@@ -1,8 +1,14 @@
+// React, Methods
 import { useForm } from "react-hook-form";
-import { useEffect, useState, MouseEvent, FormEvent } from "react";
+import { useEffect, useState, MouseEvent, useCallback} from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-//Form components
+import { getPersons } from "@/apis/PersonApis";
+import { ComboboxItem } from "@/assets/types";
+// Types
+import { CreateClub, EditClub, defaultableClubSchema, DefaultClub, Club} from "@/assets/types/clubTypes";
+// Components
+import ComboBox from "./ComboBox";
+// ShadUi Components
 import {
     Form,
     FormControl,
@@ -27,40 +33,33 @@ import {
 } from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import ComboBox from "./ComboBox";
-//Schemas
-import { CreateClub, EditClub, defaultableClubSchema, DefaultClub, Club} from "@/assets/types/clubTypes";
-//Methods
-import { getPersons } from "@/apis/PersonApis";
-import { ComboboxItem } from "@/assets/types";
-
-
+// Props
 interface Props {
-    clubData?: Club[];
-    handleCloseUI: () => void
-    onCreate?: (club: CreateClub) => void;
-    onEdit?: (club: EditClub) => void;
+    clubData?: Club[]; // Array of Club(s) to edit
+    handleCloseUI: () => void // Handler close UI event
+    onCreate?: (club: CreateClub) => void; // Handle event after click submit button -> Create
+    onEdit?: (club: EditClub) => void; // Handler event after click submit button -> Edit
 }
-
+// Component
 const ClubForm: React.FC<Props> = (props) => {
+    // Props
     const { clubData, handleCloseUI, onCreate, onEdit } = props;
-    const [ localClubData, setLocalClubData ] = useState<Club[]>([]);
-
-
-    const [ selectedData, setSelectedData ] = useState<number>(0);
-    const [ comboboxPeople, setComboBoxPeople ] = useState<ComboboxItem[]>([]);
-
+    // useStates
+    const [ localClubData, setLocalClubData ] = useState<Club[]>([]); // Save club(s) to edit in local useState 
+    const [ selectedData, setSelectedData ] = useState<number>(0); // Index for access to localClubData array to update values
+    const [ comboboxPeople, setComboBoxPeople ] = useState<ComboboxItem[]>([]); // Save fetched people from DB
+    // form
     const form = useForm<DefaultClub>({
         resolver: zodResolver(defaultableClubSchema),
         defaultValues: clubData?.[selectedData] ?? defaultableClubSchema.parse({}),
     });
-    
-    const isEdit = !!localClubData?.[selectedData];
-    const submitButtonLabel = isEdit ? "Upraviť" : "Vytvoriť";
+    // variables
+    const isEdit = !!localClubData?.[selectedData]; // Check if exist data on the first index to set editing state
+    const submitButtonLabel = isEdit ? "Upraviť" : "Vytvoriť"; 
     const submitButtonVariant = isEdit ? "orange" : "green";
     const submitButtonName = isEdit ? "update" : "create";
     const formTitle = isEdit ? "Upraviť klub" : "Vytvoriť klub";
-
+    // Fetch persons from DB 
     const fetchPersons = async () => {
         const people = await getPersons();
         if(Array.isArray(people) && people.length > 0) {
@@ -70,22 +69,21 @@ const ClubForm: React.FC<Props> = (props) => {
             }))
             setComboBoxPeople(formatted);
         } else 
-            setComboBoxPeople([])
-        
-        
+            setComboBoxPeople([])       
     }
-    const onSubmit = async (data: Club) => {
+    // Handler after submit a form -> Create / Edit
+    const onSubmit = async (data: DefaultClub) => {
         if( data.id === 0 ) {
             console.log(`Vytváram klub:`, data);
             const createClubData: CreateClub = {
-                name: data.name,
-                city: data.city,
-                street: data.street,
-                postal: data.postal,
-                ico: data.ico,
+                name: data?.name || "",
+                city: data?.city || "",
+                street: data?.street || "",
+                postal: data?.postal || "",
+                ico: data?.ico || "",
                 tel: data.tel,
                 mail: data.mail,
-                chairman: data.chid
+                chairman: data?.chairman || 0
             };
             await onCreate?.(createClubData);
             handleCloseUI();
@@ -105,17 +103,15 @@ const ClubForm: React.FC<Props> = (props) => {
             }
         }
     }
-
-
-    const handleCancelButton = (e: MouseEvent<HTMLButtonElement>) => {
+    // Handler after click exit button
+    const handleCancelButton = useCallback((e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();        
         console.log("Ruším vytvorenie klubu");
         handleCloseUI();
-    };
-
+    }, [handleCloseUI]);
+    // Add event listener to esc keyboard
     useEffect(() => {
         fetchPersons();
-
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
                 handleCancelButton(event as unknown as MouseEvent<HTMLButtonElement>);
@@ -125,16 +121,16 @@ const ClubForm: React.FC<Props> = (props) => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, []);
-
+    }, [handleCancelButton]);
+    // Resetting form after change data in selectedData, clubData and form
     useEffect(() => {
         if (clubData && clubData[selectedData]) {
             form.reset(clubData[selectedData]);
         }
-    }, [selectedData, clubData]);
+    }, [selectedData, clubData, form]);
 
-    useEffect(() => {
-        console.log(`Citam poslane data a ukladam do mojeho useState`)
+    // save coming club data to component useState
+    useEffect(() => {        
         setLocalClubData(clubData ?? []);
     }, [clubData]);
     return (
@@ -145,7 +141,7 @@ const ClubForm: React.FC<Props> = (props) => {
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit((e) => onSubmit(e))} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
                                 control={form.control}
                                 name="name"

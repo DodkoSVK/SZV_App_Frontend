@@ -32,8 +32,6 @@ export const defaultableClubSchema = z.object({
 });
 export type DefaultClub = z.input<typeof defaultableClubSchema>;
 
-
-// TO DELETE ****************************************? MAYBE
 //Club interface
 export interface Club {
     id: number

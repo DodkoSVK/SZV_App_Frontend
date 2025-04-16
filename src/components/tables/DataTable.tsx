@@ -18,15 +18,16 @@ import {
     } from "@/components/ui/table"
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Table as TableTan } from "@tanstack/react-table";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { id: number }, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[] 
     onRowSelect: (ids: number[]) => void;
-    tableRef?: React.MutableRefObject<any>; 
-    }
+    tableRef?: React.RefObject<TableTan<TData> | null>;
+}
 
-const DataTable = <TData, TValue>({ columns, data, onRowSelect, tableRef}: DataTableProps<TData, TValue>): React.ReactElement => {
+const DataTable = <TData extends { id: number }, TValue>({ columns, data, onRowSelect, tableRef}: DataTableProps<TData, TValue>): React.ReactElement => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [rowSelection, setRowSelection] = useState({})
@@ -50,12 +51,11 @@ const DataTable = <TData, TValue>({ columns, data, onRowSelect, tableRef}: DataT
     }
 
     useEffect(() => {
-        const selectedRowIndex = Object.keys(rowSelection);
-        const selectedIndexes = selectedRowIndex.map(index => data[index]?.id);
-        console.log(`Vybrane IDcko: ${selectedIndexes}`)
+        const selectedIndexes = Object.keys(rowSelection).map((index) => data[+index]?.id);
+        console.log(`Vybrane IDcko: ${selectedIndexes}`);
         onRowSelect(selectedIndexes);
-    }, [rowSelection, data]);
-   
+    }, [rowSelection, data, onRowSelect]); 
+    
     return (
         <div>
             <div className="flex items-center py-4">

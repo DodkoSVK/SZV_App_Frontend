@@ -1,38 +1,36 @@
+// React, Methods
 import { useState, useEffect, useRef } from 'react';
-import { getClubs, createClub, editClub, deleteClub } from '../../apis/ClubApis';
-//Types
-import { Club, EditClub, CreateClub } from '../../assets/types/clubTypes';
-import { FormUI, Alert} from '../../assets/types/index';
-//Components
-import SuccessAlert from '../../components/alerts/SuccessAlert';
-import FailedAlert from '../../components/alerts/FailedAlert';
-
-
-import ClubTableColumns from '../tables/ClubTableColumns';
-import DataTable from '../tables/DataTable';
+import { getClubs, createClub, editClub, deleteClub } from '@/apis/ClubApis';
+// Types
+import { Club, EditClub, CreateClub } from '@/assets/types/clubTypes';
+import { Alert} from '@/assets/types/index';
+// Components
+import SuccessAlert from '@/components/alerts/SuccessAlert';
+import FailedAlert from '@/components/alerts/FailedAlert';
+import ClubTableColumns from '@/components/tables/ClubTableColumns';
+import DataTable from '@/components/tables/DataTable';
+import ClubForm from '@/components/forms/ClubForm';
+// ShadUi Components
 import { Button } from "@/components/ui/button";
-import ClubForm from '../forms/ClubForm';
-
+import { Table } from "@tanstack/react-table";
 // Component
 const TheClubs: React.FC = () => {
-    //useStates
-    const [clubs, setClubs] = useState<Club[]>([]);
-    const [editingClub, setEditingClub] = useState<Club[]>([]);
-    const [formUI, setFormUI] = useState<boolean>(false);    
-    const [alert, setAlert] = useState<Alert | null>(null);
-    const [selecting, setSelecting] = useState<boolean>(false);
-    const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    
-    const tableRef = useRef<any>(null);
-
-
-    
+    // useStates
+    const [clubs, setClubs] = useState<Club[]>([]); // Fetched clubs from DB
+    const [editingClub, setEditingClub] = useState<Club[]>([]); // Array of selected clubs to edit
+    const [formUI, setFormUI] = useState<boolean>(false); // State to show Club form UI
+    const [alert, setAlert] = useState<Alert | null>(null); // State to show alert message
+    const [selecting, setSelecting] = useState<boolean>(false); // True -> user selecting club(s)
+    const [selectedIds, setSelectedIds] = useState<number[]>([]); // Selected ID(s) clubs
+    // useRefs 
+    const tableRef = useRef<Table<Club> | null>(null); // To clubs table for deselect    
     // Fetching all clubs
     const fetchClubs = async () => {
         const results = await getClubs();
         if(Array.isArray(results))
             setClubs(results);
     }    
+    // Creating a new club 
     const submitClub = async (clubData: CreateClub) => {
         const submitStatus = await createClub(clubData);
         if (submitStatus === 1) {
@@ -54,6 +52,7 @@ const TheClubs: React.FC = () => {
             });
         }           
     };
+    // Updating an a existing club
     const updateClub = async (clubData: EditClub) => {
         const updateStatus = await editClub(clubData);
         if (updateStatus === 1 ) {
@@ -61,7 +60,7 @@ const TheClubs: React.FC = () => {
                 alertType: true,
                 alertMessage: "Klub bol úspešne upravený"
             });
-            await getClubs();
+            await fetchClubs();
             //setFormUI({ state: false, formTitle: "" });
         } else if (updateStatus === 2 ) {
             setAlert({
@@ -75,6 +74,7 @@ const TheClubs: React.FC = () => {
             });
         }
     }
+    // Remove an a existing club
     const removeClub = async () => {
         let howmuch = 0;
         for (const selectedId of selectedIds) {
@@ -90,27 +90,22 @@ const TheClubs: React.FC = () => {
         else
             setAlert({ alertType: true, alertMessage: "Klub úspešne vymazaný." }); 
         
-        getClubs();       
+        await getClubs();       
         handleCloseFormUI();        
     } 
-    
+    // Method for closing alert, if user is faster than countdown
     const handleCloseAlert = () => {
         setAlert(null);
     };
 
-
-    // Handle selecting row(s) - DONE
+    // Insert selected club(s) ID(s) from DataTable to useState
     const handleRowSelect = (ids: number[]) => {
-        setSelectedIds(ids);
-        setSelecting(ids.length > 0);
-    }
-    // Handle De-Selecting row(s) - DONE
-    const handleRowDeSelect = () => {
-        setSelectedIds([]);
-        setSelecting(false);
-
-    }
-    // Handle open Form UI
+        if (JSON.stringify(ids) !== JSON.stringify(selectedIds)) {
+            setSelectedIds(ids);
+            setSelecting(ids.length > 0);
+        }
+    }   
+    // Oper formUI after clicking to button
     const handleOpenFormUI = () => { 
         if(selectedIds.length === 0) {
             setFormUI(true);    
@@ -119,7 +114,7 @@ const TheClubs: React.FC = () => {
             setFormUI(true);
         }                     
     };  
-    //Find Club(s) in fetched clubs  - DONE
+    // Find club by ID in fetched clubs stored locally in useState
     const findClubByID = (ids: number[]) => {
         if (Array.isArray(clubs) && Array.isArray(ids)) {
             const foundClubs = clubs.filter(club => ids.includes(club.id));
@@ -127,7 +122,7 @@ const TheClubs: React.FC = () => {
             setEditingClub(foundClubs);
         }
     }
-    //Handle close Form UI  - DONE
+    // Close form UI, -> Reload clubs -> Close FormUI -> Turn OFF selecting -> Reset selecting ID and clubs -> Deselect table row(s)
     const handleCloseFormUI = () => {
         fetchClubs();
         setFormUI(false);
@@ -136,19 +131,11 @@ const TheClubs: React.FC = () => {
         setEditingClub([]);
         tableRef.current?.resetRowSelection();
     }
-
+    // Fetch club(s) after load
     useEffect(() => {   
         fetchClubs();
     }, []);
-
-    //DEBUG ONLY ********************************** DEBUG ONLY **********************************
-
-    useEffect(() => {
-        console.log(`Clubs to update: ${editingClub}`)
-    }, [editingClub])
-
-    //DEBUG ONLY ********************************** DEBUG ONLY **********************************
-
+    //Return component
     return(
         <article>
             <div className="flex flex-row justify-between mt-4 text-3xl mx-20 font-bold text-left text-[oklch(var(--foreground))] uppercase">
