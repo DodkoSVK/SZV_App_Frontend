@@ -8,8 +8,15 @@ import PersonForm from "../persons/PersonForm";
 import { FormUI, Alert } from "../../assets/types/index";
 import SuccessAlert from "../alerts/SuccessAlert";
 import FailedAlert from "../alerts/FailedAlert";
+import DataTable from "../tables/DataTable";
+import PersonTableColumns from "../tables/PersonTableColumns";
+import { Button } from "@/components/ui/button";
+import { Table } from "@tanstack/react-table";
 //Component
 const ThePersons: React.FC = () => {
+    const [ selecting, setSelecting ] = useState<boolean>(false);
+
+
     const [persons, setPersons] = useState<Person[] | {message: string}>({ message: ""});
     const [editingPerson, setEditingPerson] = useState<Person>();
     const [formUiData, setFormUiData] = useState<FormUI>();
@@ -112,10 +119,52 @@ const ThePersons: React.FC = () => {
         handleFetchAllPeoples();
     },[])
 
+
+
+    // Insert selected club(s) ID(s) from DataTable to useState
+    const handleRowSelect = (ids: number[]) => {
+        console.log(`Ta oznacujem`)
+        /* if (JSON.stringify(ids) !== JSON.stringify(selectedIds)) {
+            setSelectedIds(ids);
+            setSelecting(ids.length > 0);
+        } */
+    }   
     return (
         <article>
-            <div className="m-8 text-3xl font-bold text-center text-[#F7F9FB] uppercase">
+            <div className="flex flex-row justify-between mt-4 text-3xl mx-20 font-bold text-left text-[oklch(var(--foreground))] uppercase">
                 <h1>Športovci SZV</h1>
+                <div className="flex flex-row gap-2">   
+                    { selecting && (
+                        <>
+                            <Button 
+                                variant="red"
+                                onClick={() => console.log(`Remove club`)}
+                            >
+                                Vymazať
+                            </Button>
+                            <Button 
+                                variant="orange"
+                                onClick={() => console.log(`Edit club`)}
+                            >
+                                Upraviť
+                            </Button>
+                        </>                                                
+                    )}            
+                    <Button 
+                        variant="green"
+                        onClick={() => console.log(`Create club`)}
+                    >
+                        Pridať
+                    </Button>
+                </div>                
+            </div>
+            <div className="mx-10">
+                <DataTable
+                    columns={PersonTableColumns}
+                    data={Array.isArray(persons) ? persons : []}
+                    onRowSelect={handleRowSelect}
+                />
+
             </div>
             <PersonsTable 
                 persons={persons}
