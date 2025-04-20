@@ -25,9 +25,10 @@ interface DataTableProps<TData extends { id: number }, TValue> {
     data: TData[] 
     onRowSelect: (ids: number[]) => void;
     tableRef?: React.RefObject<TableTan<TData> | null>;
+    columnFilterName: string
 }
 
-const DataTable = <TData extends { id: number }, TValue>({ columns, data, onRowSelect, tableRef}: DataTableProps<TData, TValue>): React.ReactElement => {
+const DataTable = <TData extends { id: number }, TValue>({ columns, data, onRowSelect, tableRef, columnFilterName}: DataTableProps<TData, TValue>): React.ReactElement => {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [rowSelection, setRowSelection] = useState({})
@@ -61,9 +62,9 @@ const DataTable = <TData extends { id: number }, TValue>({ columns, data, onRowS
             <div className="flex items-center py-4">
             <Input
                 placeholder="Filtrovať kluby..."
-                value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                value={(table.getColumn(`${columnFilterName}`)?.getFilterValue() as string) ?? ""}
                 onChange={(event) =>
-                    table.getColumn("name")?.setFilterValue(event.target.value)
+                    table.getColumn(`${columnFilterName}`)?.setFilterValue(event.target.value)
                 }
                 className="max-w-sm"
             />

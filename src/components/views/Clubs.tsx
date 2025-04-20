@@ -4,7 +4,7 @@ import { getClubs, createClub, editClub, deleteClub } from '@/apis/ClubApis';
 // Types
 import { Club, EditClub, CreateClub } from '@/assets/types/clubTypes';
 import { Alert} from '@/assets/types/index';
-// Components
+//Children Components
 import SuccessAlert from '@/components/alerts/SuccessAlert';
 import FailedAlert from '@/components/alerts/FailedAlert';
 import ClubTableColumns from '@/components/tables/ClubTableColumns';
@@ -21,16 +21,16 @@ const TheClubs: React.FC = () => {
     const [formUI, setFormUI] = useState<boolean>(false); // State to show Club form UI
     const [alert, setAlert] = useState<Alert | null>(null); // State to show alert message
     const [selecting, setSelecting] = useState<boolean>(false); // True -> user selecting club(s)
-    const [selectedIds, setSelectedIds] = useState<number[]>([]); // Selected ID(s) clubs
+    const [selectedIds, setSelectedIds] = useState<number[]>([]); // Selected ID(s) club(s)
     // useRefs 
-    const tableRef = useRef<Table<Club> | null>(null); // To clubs table for deselect    
+    const tableRef = useRef<Table<Club> | null>(null); // To clubs table for deselect row(s)
     // Fetching all clubs
     const fetchClubs = async () => {
         const results = await getClubs();
         if(Array.isArray(results))
             setClubs(results);
     }    
-    // Creating a new club 
+    // Creating a new Club 
     const submitClub = async (clubData: CreateClub) => {
         const submitStatus = await createClub(clubData);
         if (submitStatus === 1) {
@@ -61,7 +61,6 @@ const TheClubs: React.FC = () => {
                 alertMessage: "Klub bol úspešne upravený"
             });
             await fetchClubs();
-            //setFormUI({ state: false, formTitle: "" });
         } else if (updateStatus === 2 ) {
             setAlert({
                 alertType: false,
@@ -76,21 +75,21 @@ const TheClubs: React.FC = () => {
     }
     // Remove an a existing club
     const removeClub = async () => {
-        let howmuch = 0;
+        let howMuch = 0;
         for (const selectedId of selectedIds) {
             const removeStatus = await deleteClub(selectedId);
             if ( removeStatus === 2) {
                 setAlert({ alertType: false, alertMessage: "Nepodarilo sa vymazať klub." });
                 break;
             } 
-            howmuch++;
+            howMuch++;
         }
-        if( howmuch > 1)
-            setAlert({ alertType: true, alertMessage: `Bolo úspešne vymazaných ${howmuch} klubov.` });
+        if( howMuch > 1)
+            setAlert({ alertType: true, alertMessage: `Bolo úspešne vymazaných ${howMuch} klubov.` });
         else
             setAlert({ alertType: true, alertMessage: "Klub úspešne vymazaný." }); 
         
-        await getClubs();       
+        await fetchClubs();       
         handleCloseFormUI();        
     } 
     // Method for closing alert, if user is faster than countdown
@@ -114,14 +113,6 @@ const TheClubs: React.FC = () => {
             setFormUI(true);
         }                     
     };  
-    // Find club by ID in fetched clubs stored locally in useState
-    const findClubByID = (ids: number[]) => {
-        if (Array.isArray(clubs) && Array.isArray(ids)) {
-            const foundClubs = clubs.filter(club => ids.includes(club.id));
-            console.log(`Found clubs ${JSON.stringify(foundClubs)}`);
-            setEditingClub(foundClubs);
-        }
-    }
     // Close form UI, -> Reload clubs -> Close FormUI -> Turn OFF selecting -> Reset selecting ID and clubs -> Deselect table row(s)
     const handleCloseFormUI = () => {
         fetchClubs();
@@ -131,6 +122,14 @@ const TheClubs: React.FC = () => {
         setEditingClub([]);
         tableRef.current?.resetRowSelection();
     }
+     // Find person by ID in fetched clubs and stored in component useState
+    const findClubByID = (ids: number[]) => {
+        if (Array.isArray(clubs) && Array.isArray(ids)) {
+            const foundClubs = clubs.filter(club => ids.includes(club.id));
+            //console.log(`Found clubs ${JSON.stringify(foundClubs)}`);
+            setEditingClub(foundClubs);
+        }
+    }    
     // Fetch club(s) after load
     useEffect(() => {   
         fetchClubs();
@@ -171,6 +170,7 @@ const TheClubs: React.FC = () => {
                     data={Array.isArray(clubs) ? clubs : []}                   
                     onRowSelect={handleRowSelect}
                     tableRef={tableRef}
+                    columnFilterName="name"
                 />
             </div>        
             { formUI && (

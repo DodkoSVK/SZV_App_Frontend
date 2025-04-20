@@ -1,134 +1,187 @@
-import { useEffect, useState } from "react";
-import { getPersons, getSortedPersons, createPerson, updatePerson, deletePerson} from "../../apis/PersonApis";
+// React, Methods
+import { useEffect, useState, useRef } from "react";
+import { getPersons, createPerson, editPerson, deletePerson} from "@/apis/PersonApis";
 //Types
-import { Person, CreatePerson, EditPerson } from "../../assets/types/personTypes";
+import { Person, CreatePerson, EditPerson } from "@/assets/types/personTypes";
+import { Alert } from "@/assets/types/index";
 //Children Components
-import PersonsTable from "../persons/PersonsTable";
-import PersonForm from "../persons/PersonForm";
-import { FormUI, Alert } from "../../assets/types/index";
-import SuccessAlert from "../alerts/SuccessAlert";
-import FailedAlert from "../alerts/FailedAlert";
-import DataTable from "../tables/DataTable";
-import PersonTableColumns from "../tables/PersonTableColumns";
+import SuccessAlert from "@/components/alerts/SuccessAlert";
+import FailedAlert from "@/components/alerts/FailedAlert";
+import DataTable from "@/components/tables/DataTable";
+import PersonTableColumns from "@/components/tables/PersonTableColumns";
+import PersonForm from "@/components/forms/PersonForm";
+// ShadUi Components
 import { Button } from "@/components/ui/button";
 import { Table } from "@tanstack/react-table";
+
 //Component
 const ThePersons: React.FC = () => {
-    const [ selecting, setSelecting ] = useState<boolean>(false);
-
-
-    const [persons, setPersons] = useState<Person[] | {message: string}>({ message: ""});
-    const [editingPerson, setEditingPerson] = useState<Person>();
-    const [formUiData, setFormUiData] = useState<FormUI>();
-    const [alert, setAlert] = useState<Alert>();
-
-    //Persons handlers
-    //Get all peoples
-    const handleFetchAllPeoples = async () => {
-        const results = await getPersons();
-        console.log(results)
-        if (Array.isArray(results)) 
-            setPersons(results);
-        else 
-            setPersons({message: results.message});          
+    // useStates
+    const [persons, setPersons] = useState<Person[]>([]); // Fetched persons from DB
+    const [editingPerson, setEditingPerson] = useState<Person[]>([]); // Array of selected persons to edit
+    const [formUI, setFormUI] = useState<boolean>(false); // State to show Person Form UI
+    const [alert, setAlert] = useState<Alert | null>(null); // State to show alert message
+    const [ selecting, setSelecting ] = useState<boolean>(false); // True -> user selecting person(s)
+    const [ selectedIds, setSelectedIds ] = useState<number[]>([]); // Selected ID(s) person(s)
+    // useRefs
+    const tableRef = useRef<Table<Person> | null>(null); //Ref to person table for deselect row(s)
+    // Fetching all persons
+    const fetchPersons = async () => {
+        try {
+            const results = await getPersons();
+            if (Array.isArray(results)) 
+                setPersons(results);  
+        } catch (e) {
+            const error = 2001;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+        }                     
     };
-    //Get all sorted peoples
-    const handleFetchSortedPersons = async (key: string) => {
-        const results = await getSortedPersons(key);
-        if (Array.isArray(results)) 
-            setPersons(results);            
-        else 
-            setPersons({message: results.message});           
+    // Create a new Person
+    const submitPerson = async (personData: CreatePerson) => {
+        try {
+            const submitStatus = await createPerson(personData);
+            if(submitStatus === 1 ) {
+                setAlert({
+                    alertType: true,
+                    alertMessage: "Osoba bola úspešne vytvorená"
+                });
+                await fetchPersons();
+                setFormUI(false);
+            } else if (submitStatus === 2 ) {
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Nesprávna požiadavka"
+                });
+            } else if (submitStatus === 3) {
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Chyba pri spracovaní požiadavky"
+                });
+            }     
+        } catch (e) {
+            const error = 2002;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+        }        
     };
-    //Get person by id
-    const handleSearchPersonById = (idPerson: number) => {
-        if (Array.isArray(persons))
-            setEditingPerson(persons.find(person => person.id === idPerson))
-    };
-    const handleCreatePerson = async (person: Person) => {
-        const creatingPerson: CreatePerson = {
-            fname: person.fname,
-            sname: person.sname,
-            birth: person.birth,
-            ...(person.club_id !== 0 && { club: person.club_id })
-        };
-        console.log(`Ta vyvaram personu: ${JSON.stringify(creatingPerson)}`);
-        const createStatus = await createPerson(creatingPerson);
-        if (createStatus === 1) {
-            setAlert({ alertType: true, alertMessage: "Osoba vytvorená"});
-            handleCloseFormUI();
-            handleFetchAllPeoples();
-        }          
-        else if (createStatus === 2 ){
-            setAlert({ alertType: false, alertMessage: "Nepodarilo sa vytvoriť osobu"}); 
-        }             
-        else if (createStatus === 3){
-            setAlert({ alertType: false, alertMessage: "Nepodarilo sa vytvoriť osobu. Chyba na strane servera"}); 
-        }          
+    // Edit an a existing person
+    const updatePerson = async (personData: EditPerson) => {
+        try {
+            const updateStatus = await editPerson(personData);
+            if (updateStatus === 1 ) {
+                setAlert({
+                    alertType: true,
+                    alertMessage: "Osoba bola úspešne upravená"
+                });
+                await fetchPersons();
+            } else if (updateStatus === 2 ) {
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Nesprávna požiadavka"
+                }) 
+            } else if (updateStatus === 3) {
+                setAlert({
+                    alertType: false,
+                    alertMessage: "Chyba pri spracovaní požiadavky"
+                });
+            }
+        } catch (e) {
+            const error = 2003;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+        }
     }
-    const handleUpdatePerson = async (person: Person) => {        
-        const editingPerson: EditPerson = {
-            fname: person?.fname,
-            sname: person?.sname,
-            birth: person?.birth           
+    // Remove an a existing person(s)
+    const removePerson = async () => {
+        try {
+            let howMuch = 0;
+            for (const selectedId of selectedIds) {
+                const removeStatus = await deletePerson(selectedId);
+                if( removeStatus === 2 ) {
+                    setAlert({ alertType: false, alertMessage: "Nepodarilo sa vymazať osobu"});
+                    break;
+                }
+                howMuch++;
+            }
+            if( howMuch > 1)
+                setAlert({ alertType: true, alertMessage: `Bolo úspešne vymazaných ${howMuch} osôb.` });
+            else
+                setAlert({ alertType: true, alertMessage: "Osoba úspešne vymazaná." }); 
+            
+            await fetchPersons();       
+            handleCloseFormUI(); 
+        } catch (e) {
+            const error = 2004;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
         }
-        if(person.club_id && person.club_id > 0)
-            editingPerson.club = person.club_id;
-        
-        const editStatus = await updatePerson(person.id,editingPerson);
-        if (editStatus === 1) {
-            setAlert({ alertType: true, alertMessage: "Osoba upravená"});
-            handleCloseFormUI();
-            handleFetchAllPeoples();
-        } else if (editStatus === 2 ){
-            setAlert({ alertType: false, alertMessage: "Nepodarilo sa upraviť osobu"}); 
-        } else if (editStatus === 3){
-            setAlert({ alertType: false, alertMessage: "Nepodarilo sa upraviť osobu. Chyba na strane servera"}); 
-        }  
-    };
-    const handleDeletePerson = async (personId: number) => {
-        console.log(`Ta mazem personu: ${personId}`);
-        const deleteStatus = await deletePerson(personId);
-        console.log(`Delete status ${deleteStatus}`);
-        if (deleteStatus === 1 ) 
-            setAlert({ alertType: true, alertMessage: "Osoba odstránená"});            
-        else if ( deleteStatus === 2 ) 
-            setAlert({ alertType: false, alertMessage: "Nepodarilo sa odstrániť osobu."});         
-        else if ( deleteStatus === 3)
-            setAlert({ alertType: false, alertMessage: "Nepodarilo sa odstrániť osobu. Chyba na strane servera"});
-        handleCloseFormUI();
-        handleFetchAllPeoples();
-    };
-    //UI Handlers
-    const handleOpenFormUI = (idPerson: number) => {
-        if(idPerson === 0) 
-            setFormUiData({state: true, formTitle: "Vytvoriť novú osobu"})
-        else {
-            setFormUiData({state: true, formTitle: "Upraviť osobu"})
-            handleSearchPersonById(idPerson);
-        }
-    };
-    const handleCloseFormUI = () => {
-        setFormUiData({state: false, formTitle: ""})
-        setEditingPerson(undefined);
-    };
+    }
+    // Method for closing alert, if user is faster than countdown
     const handleCloseAlert = () => {
-        setAlert(undefined);
+        try {
+            setAlert(null);
+        } catch (e) {
+            const error = 2005;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+        }
     }    
-    useEffect(() => {
-        handleFetchAllPeoples();
-    },[])
-
-
-
-    // Insert selected club(s) ID(s) from DataTable to useState
+    // Method to insert selected Person(s) from DataTable to useState
     const handleRowSelect = (ids: number[]) => {
-        console.log(`Ta oznacujem`)
-        /* if (JSON.stringify(ids) !== JSON.stringify(selectedIds)) {
-            setSelectedIds(ids);
-            setSelecting(ids.length > 0);
-        } */
+        try {
+            if (JSON.stringify(ids) !== JSON.stringify(selectedIds)) {
+                setSelectedIds(ids);
+                setSelecting(ids.length > 0);
+            }
+        } catch (e) {
+            const error = 2006;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+        }
     }   
+    // Open formUi after clicking to button
+    const handleOpenFormUI = () => {
+        try {
+            if(selectedIds.length === 0) {
+                setFormUI(true);    
+            } else {
+                searchPersonByID(selectedIds);            
+                setFormUI(true);
+            } 
+        } catch (e) {
+            const error = 2007;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+        }
+    };
+    // Close form UI, -> Reload persons -> Close FormUI -> Turn OFF selecting -> Reset selecting ID and persons -> Deselect table row(s)
+    const handleCloseFormUI = () => {
+       fetchPersons();
+       setFormUI(false);
+       setSelecting(false);
+       setSelectedIds([]);
+       setEditingPerson([]);
+       tableRef.current?.resetRowSelection();
+    };
+    // Find person by ID in fetched persons and stored in component useState
+    const searchPersonByID = (ids: number[]) => {
+        try {
+            if (Array.isArray(persons) && Array.isArray(ids)) {
+                const foundPersons = persons.filter(person => ids.includes(person.id));
+                setEditingPerson(foundPersons);
+            }
+        } catch (e) {
+            const error = 2008;
+            console.log(`🔴 Chyba: ${error}. ${e}`);
+            setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+        }
+    };
+    // Fetch persons(s) after load
+    useEffect(() => {
+        fetchPersons();
+    },[]);
+    // Return component   
     return (
         <article>
             <div className="flex flex-row justify-between mt-4 text-3xl mx-20 font-bold text-left text-[oklch(var(--foreground))] uppercase">
@@ -138,13 +191,13 @@ const ThePersons: React.FC = () => {
                         <>
                             <Button 
                                 variant="red"
-                                onClick={() => console.log(`Remove club`)}
+                                onClick={() => removePerson()}
                             >
                                 Vymazať
                             </Button>
                             <Button 
                                 variant="orange"
-                                onClick={() => console.log(`Edit club`)}
+                                onClick={() => handleOpenFormUI()}
                             >
                                 Upraviť
                             </Button>
@@ -152,7 +205,7 @@ const ThePersons: React.FC = () => {
                     )}            
                     <Button 
                         variant="green"
-                        onClick={() => console.log(`Create club`)}
+                        onClick={() => handleOpenFormUI()}
                     >
                         Pridať
                     </Button>
@@ -163,37 +216,31 @@ const ThePersons: React.FC = () => {
                     columns={PersonTableColumns}
                     data={Array.isArray(persons) ? persons : []}
                     onRowSelect={handleRowSelect}
+                    tableRef={tableRef}
+                    columnFilterName="fname"
                 />
 
-            </div>
-            <PersonsTable 
-                persons={persons}
-                sortBy={handleFetchSortedPersons}
-                formUiData={handleOpenFormUI}
-            /> 
-            { formUiData?.state && (
+            </div>            
+            { formUI && (
                 <PersonForm 
-                    formTitle={formUiData.formTitle}
-                    closeUI={handleCloseFormUI}
                     personData={editingPerson}
-                    createPerson={handleCreatePerson}
-                    updatePerson={handleUpdatePerson}
-                    deletePerson={handleDeletePerson}
+                    handleCloseUI={handleCloseFormUI}
+                    onCreate={submitPerson}
+                    onEdit={updatePerson}
                 />
             )}
-            {alert ? (
-                alert.alertType ? (
-                    <SuccessAlert  
-                        alertMessage={alert.alertMessage}
-                        closeRequest={handleCloseAlert}
-                    />
-                ) : (
-                    <FailedAlert
-                        alertMessage={alert.alertMessage}
-                        closeRequest={handleCloseAlert}
-                    />
-                )
-            ) : null}
+            {alert?.alertType === true && (
+                <SuccessAlert  
+                    alertMessage={alert.alertMessage}
+                    closeRequest={handleCloseAlert}
+                />
+            )}
+            {alert?.alertType === false && (
+                <FailedAlert
+                    alertMessage={alert.alertMessage}
+                    closeRequest={handleCloseAlert}
+                />
+            )}
         </article>
     );    
 };

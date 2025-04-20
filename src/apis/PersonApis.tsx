@@ -62,10 +62,9 @@ export const createPerson = async (person: CreatePerson) => {
         if(code >= 500) return 3;  
     });
 }
-export const updatePerson = async (id: number,person: EditPerson) => {
+export const editPerson = async (person: EditPerson) => {
     console.log(`🟡 Upravujem osobu s týmito údajmi: ${JSON.stringify(person)}`);
-    /* return axios.patch(`https://app.vzpieranie.sk:3002/api/person/${id}`, person)  */
-    return axios.patch(`http://localhost:3002/api/person/${id}`, person)    
+    return axios.patch(`https://app.vzpieranie.sk:3002/api/person/${person.id}`, person)    
     .then(res => {
         const code = res.status;
         if (code >= 200 && code < 300) return 1;          

@@ -1,0 +1,24 @@
+{
+    "errors" : {
+        "club_erros" : {
+            "Failed to fetch clubs from DB in Frontend": 1001,
+            "Failed to create a new Club to DB in Frontend": 1002,
+            "Failed to Edit a Club to DB in Frontend": 1003,
+            "Failed to Remove a Club from DB in Frontend": 1004,
+            "Failed to close alert in Clubs": 1005,
+            "Failed select Row(s) in Clubs": 1006,
+            "Failed open Form UI in Clubs": 1007,
+            "Failed find club(s) by ID in fetched club in component useState": 1008
+        },
+        "person_erros" : {
+            "Failed to fetch people from DB in Frontend": 2001,
+            "Failed to create a new Person to DB in Frontend": 2002,
+            "Failed to Edit a Person to DB in Frontend": 2003,
+            "Failed to Remove a Person from DB in Frontend": 2004,
+            "Failed to close alert in Persons": 2005,
+            "Failed select Row(s) in Persons": 2006,
+            "Failed open Form UI in Persons": 2007,
+            "Failed find person(s) by ID in fetched person in component useState": 2008
+        }
+    }
+}

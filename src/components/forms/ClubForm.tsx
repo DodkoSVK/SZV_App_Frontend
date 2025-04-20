@@ -16,29 +16,29 @@ import {
     FormItem,
     FormLabel,
     FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
     Card,
     CardContent,
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
     PaginationNext,
     PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/input";
 // Props
 interface Props {
     clubData?: Club[]; // Array of Club(s) to edit
     handleCloseUI: () => void // Handler close UI event
-    onCreate?: (club: CreateClub) => void; // Handle event after click submit button -> Create
-    onEdit?: (club: EditClub) => void; // Handler event after click submit button -> Edit
+    onCreate: (club: CreateClub) => void; // Handle event after click submit button -> Create
+    onEdit: (club: EditClub) => void; // Handler event after click submit button -> Edit
 }
 // Component
 const ClubForm: React.FC<Props> = (props) => {
@@ -76,20 +76,20 @@ const ClubForm: React.FC<Props> = (props) => {
         if( data.id === 0 ) {
             console.log(`Vytváram klub:`, data);
             const createClubData: CreateClub = {
-                name: data?.name || "",
-                city: data?.city || "",
-                street: data?.street || "",
-                postal: data?.postal || "",
-                ico: data?.ico || "",
+                name: data.name || "",
+                city: data.city || "",
+                street: data.street || "",
+                postal: data.postal || "",
+                ico: data.ico || "",
                 tel: data.tel,
                 mail: data.mail,
-                chairman: data?.chairman || 0
+                chairman_id: data.chairman_id || 0
             };
-            await onCreate?.(createClubData);
+            await onCreate(createClubData);
             handleCloseUI();
         } else {
             console.log(`Upravujem klub:`, data);
-            await onEdit?.(data);
+            await onEdit(data);
             const updatedClubData = [...localClubData];
             updatedClubData.splice(selectedData, 1);
             setLocalClubData(updatedClubData);
@@ -125,13 +125,14 @@ const ClubForm: React.FC<Props> = (props) => {
     // Resetting form after change data in selectedData, clubData and form
     useEffect(() => {
         if (clubData && clubData[selectedData]) {
+            console.log("RESETUJEM:", clubData[selectedData]);
             form.reset(clubData[selectedData]);
         }
     }, [selectedData, clubData, form]);
 
     // save coming club data to component useState
     useEffect(() => {        
-        setLocalClubData(clubData ?? []);
+        setLocalClubData(clubData ?? []);        
     }, [clubData]);
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-filter backdrop-blur-xs">       
@@ -245,7 +246,7 @@ const ClubForm: React.FC<Props> = (props) => {
 
                             <FormField
                                 control={form.control}
-                                name="chairman"
+                                name="chairman_id"
                                 render={({ field }) => (
                                     <FormItem className="w-full">
                                         <FormLabel>Štatutár</FormLabel>
@@ -254,7 +255,8 @@ const ClubForm: React.FC<Props> = (props) => {
                                                 label="Vyberte osobu"
                                                 notFoundText="Nenašla sa žiadna osoba"
                                                 items={comboboxPeople}
-                                                {...field}
+                                                value={field.value}
+                                                onChange={field.onChange}
                                             />                                        
                                         </FormControl>                                    
                                         <FormMessage />
@@ -281,7 +283,7 @@ const ClubForm: React.FC<Props> = (props) => {
                         </form>
                     </Form>
                 </CardContent> 
-                { localClubData && localClubData.length > 0 && (
+                { localClubData && localClubData.length > 1 && (
                     <CardFooter>
                         <Pagination>
                             <PaginationContent>
