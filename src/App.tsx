@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import TheNavigation from './components/TheNavigation';
 import TheClubs from './components/views/Clubs';
 import ThePersons from './components/views/Persons';
-import TheCompetitions from './components/views/competitions';
+import TheCompetitions from './components/views/Competitions';
 import Home from './components/views/Home';
 
 function App() {

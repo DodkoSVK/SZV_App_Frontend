@@ -24,7 +24,7 @@ export const defaultPersonSchcema = z.object({
     club_name: z.string().default("")
 });
 export type DefaultPerson = z.input<typeof defaultPersonSchcema>;
-// Person interface
+// Person interface 
 export interface Person {
     id: number
     fname: string

@@ -3,7 +3,7 @@ import { Competition } from "../assets/types/competitionTypes";
 
 export const getCompetitions = async () => {
     console.log("🟡 Získavam všetky súťaže");
-    return axios.get('http://localhost:3002/api/competition').then(response => {
+    return axios.get('https://app.vzpieranie.sk:3002/api/competition').then(response => {
         const code = response.status;
         if (code >= 200 && code < 300) {
             if(Array.isArray(response.data)) return (response.data);            
@@ -21,7 +21,7 @@ export const getCompetitions = async () => {
 
 export const createCompetition = async (competition: Competition) => {
     console.log("🟡 Vytváram súťaž s týmito údajmi: ", competition);
-    return axios.post('http://localhost:3002/api/competition', competition).then(response => {            
+    return axios.post('https://app.vzpieranie.sk:3002/api/competition', competition).then(response => {            
         const code = response.status;            
         if (code >= 200 && code < 300) return 1;                
     }).catch(error => {
