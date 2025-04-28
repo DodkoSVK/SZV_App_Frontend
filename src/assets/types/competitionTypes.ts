@@ -5,12 +5,13 @@ export const baseCompetitionLocationSchema = z.object({
     id: z.number(),
     group: z.string().min(1, "Názov skupiny je povinný"),
     city: z.string().min(1, "Miesto súťaže je povinné"),
-    club_id: z.union([z.number().min(1, "Vyberte iný klub"), z.literal(0)]).optional()
+    club_id: z.union([z.number().min(1, "Vyberte iný klub"), z.literal(0)]).optional(),
+    club_name: z.string()
 });
 // Competition base scheme
 export const baseCompetitionSchema = z.object({
     id: z.number(),
-    league_id: z.union([z.number().min(1, "Vyberte inú ligu"), z.literal(0)]).optional(),
+    league_name: z.union([z.number().min(1, "Vyberte inú ligu"), z.literal(0)]).optional(),
     round: z.number().min(1, "Kolko je povinný údaj"),
     date: z.coerce.date().min(new Date("2025-01-01"), "Dátum je povinný údaj"),
     locations: z.array(baseCompetitionLocationSchema)
@@ -26,7 +27,8 @@ export const defaultCompetitionLocationSchema = z.object({
     id: z.number().default(0),
     group: z.string().default(""),
     city: z.string().default(""),
-    club_id: z.number().default(0)
+    club_id: z.number().default(0),
+    club_name: z.string().default("")
 });
 export type DefaultCompetitionlocation = z.input<typeof defaultCompetitionLocationSchema>;
 //Competition default type and schema with default values
@@ -43,7 +45,8 @@ export interface CompetitionLocation {
     id: number;
     group: string;
     city: string;
-    club: number
+    club_id: number;
+    club_name: string;
 }    
 export interface Competition {
     id: number;

@@ -34,7 +34,7 @@ const TheCompetitions: React.FC = () => {
                     id: loc.id,
                     group: loc.group,
                     city: loc.city,
-                    club: loc.club 
+                    club_name: loc.club_name
                 }))
             }));
             console.log(`Competitions: ${JSON.stringify(comps)}`)

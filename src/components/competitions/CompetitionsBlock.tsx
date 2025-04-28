@@ -32,16 +32,16 @@ const CompetitionsBlock: React.FC<Props> = (props) => {
     // Function to handle check competitions
     const toggleCompetition = (id: number, checked: boolean) => {
         setSelectedCompetitions(prev => {
-          const newSet = new Set(prev);
-          if (checked) {
-            newSet.add(id);
-          } else {
-            newSet.delete(id);
-          }
-          return newSet;
+            const newSet = new Set(prev);
+            if (checked)
+                newSet.add(id);
+            else 
+                newSet.delete(id);
+            
+            return newSet;
         });
-      };
-      
+    };
+    
     
     // Send selected competitions ID(s) to competition component after render complete
     useEffect(() => {
@@ -56,14 +56,13 @@ const CompetitionsBlock: React.FC<Props> = (props) => {
             { Array.isArray(localCompetitions) && localCompetitions.length > 0 ? (
                 localCompetitions.map(competition => (
                     <Card key={competition.id} className={`w-full border-1 ${roundColors[competition.round] ?? "border-gray-300"}`}>
-                        <CardHeader className="flex flex-row justify-start items-center gap-4 text-2xl"
->
+                        <CardHeader className="flex flex-row justify-start items-center gap-4 text-2xl">
                             <Checkbox
                                 checked = {selectedCompetitions.has(competition.id)}
                                 onCheckedChange={(checked) => toggleCompetition(competition.id, checked)}
                             />
                             <CardTitle>
-                                {`${competition.round}. Kolo, ${competition.league}`}
+                                {`${competition.round}. Kolo, ${competition.league}, ${competition.date}`}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -72,7 +71,7 @@ const CompetitionsBlock: React.FC<Props> = (props) => {
                                 {competition.locations.map(location => (
                                     <li key={`${competition.id}.${location.id}`}>
                                         <p className="font-semibold">{`Skupina: ${location.group}`}</p>
-                                        <p className="text-sm">- {`Usporiadateľ: ${location.club}`}</p>
+                                        <p className="text-sm">- {`Usporiadateľ: ${location.club_name}`}</p>
                                         <p className="text-sm">- {`Mesto: ${location.city}`}</p>
                                     </li>
                                 ))}
