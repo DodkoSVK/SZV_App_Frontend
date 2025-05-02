@@ -2,10 +2,10 @@ import { Routes, Route } from 'react-router-dom';
 
 // Components
 import TheNavigation from './components/TheNavigation';
-import TheClubs from './components/views/Clubs';
-import ThePersons from './components/views/Persons';
-import TheCompetitions from './components/views/Competitions';
-import Home from './components/views/Home';
+import TheClubs from './components/views/TheClubs';
+import ThePersons from './components/views/ThePersons';
+import TheCompetitions from './components/views/TheCompetitions';
+import Home from './components/views/TheHome';
 
 function App() {
   return (

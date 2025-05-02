@@ -13,7 +13,7 @@ import {
     CardContent,
     CardFooter,
     CardHeader,
-    CardTitle,
+    CardTitle
 } from "@/components/ui/card";
 import {
     Form,
@@ -21,20 +21,19 @@ import {
     FormDescription,
     FormField,
     FormItem,
-    FormLabel,
-    FormMessage,
+    FormLabel
 } from "@/components/ui/form";
 import {
     Popover,
     PopoverContent,
-    PopoverTrigger,
+    PopoverTrigger
 } from "@/components/ui/popover";
 import {
     Pagination,
     PaginationContent,
     PaginationItem,
     PaginationNext,
-    PaginationPrevious,
+    PaginationPrevious
 } from "@/components/ui/pagination";
 import ComboBox from "./ComboBox";
 import { Calendar } from "@/components/ui/calendar";
@@ -213,8 +212,8 @@ const CompetitionForm: React.FC<Props> = (props) => {
             const selected = localCompetitionData[selectedData];
             form.reset({
             ...selected,
-            date: parse(selected.date, "dd/MM/yyyy", new Date()),
-        });
+            date: selected.date,
+        }as DefaultCompetition);
         }
     }, [localCompetitionData, selectedData]);
     

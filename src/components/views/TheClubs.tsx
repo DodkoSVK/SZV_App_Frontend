@@ -7,7 +7,7 @@ import { Alert} from '@/assets/types/index';
 //Children Components
 import SuccessAlert from '@/components/alerts/SuccessAlert';
 import FailedAlert from '@/components/alerts/FailedAlert';
-import ClubTableColumns from '@/components/tables/ClubTableColumns';
+import ClubTableColumns from '@/components/clubs/ClubTableColumns';
 import DataTable from '@/components/tables/DataTable';
 import ClubForm from '@/components/forms/ClubForm';
 // ShadUi Components

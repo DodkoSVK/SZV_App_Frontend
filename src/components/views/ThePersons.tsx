@@ -8,7 +8,7 @@ import { Alert } from "@/assets/types/index";
 import SuccessAlert from "@/components/alerts/SuccessAlert";
 import FailedAlert from "@/components/alerts/FailedAlert";
 import DataTable from "@/components/tables/DataTable";
-import PersonTableColumns from "@/components/tables/PersonTableColumns";
+import PersonTableColumns from "@/components/persons/PersonTableColumns";
 import PersonForm from "@/components/forms/PersonForm";
 // ShadUi Components
 import { Button } from "@/components/ui/button";

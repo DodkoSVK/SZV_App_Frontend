@@ -2,6 +2,7 @@ import { Person } from "../../assets/types/personTypes";
 import { useRef, MouseEvent } from "react";
 import editIcon from '../../assets/edit.svg';
 import plusIcon from '../../assets/plus.svg';
+import { format } from "date-fns";
 
 interface Props {
     persons: Person[] | { message: string };
@@ -109,10 +110,10 @@ const PersonsTable: React.FC<Props> = (props) => {
                                     {person.sname}
                                 </td>
                                 <td className="px-6 py-4">
-                                    {person.birth}
+                                    {format(new Date(person.birth), "dd.MM.yyyy")}
                                 </td>  
                                 <td className="px-6 py-4">
-                                    {person.club}
+                                    {person.club_id}
                                 </td>                                 
                                 <td className="px-6 py-4">
                                     <button onClick={() => handleEdit(person.id)}>                                
