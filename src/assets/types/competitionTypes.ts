@@ -1,60 +1,72 @@
 import { z } from "zod";
 
-// Competition Location base scheme 
-export const baseCompetitionLocationSchema = z.object({
+/* ------------------------ Base schemas ------------------------ */
+export const baseLocationSchema = z.object({
     id: z.number(),
-    group: z.string().min(1, "Názov skupiny je povinný"),
-    city: z.string().min(1, "Miesto súťaže je povinné"),
-    club_id: z.union([z.number().min(1, "Vyberte iný klub"), z.literal(0)]).optional(),
-    club_name: z.string()
+    group: z.string(),
+    city: z.string(),
+    club_id: z.number(),
+    club_name: z.string(),
 });
-// Competition base scheme
+
 export const baseCompetitionSchema = z.object({
     id: z.number(),
-    league_name: z.union([z.number().min(1, "Vyberte inú ligu"), z.literal(0)]).optional(),
-    round: z.number().min(1, "Kolko je povinný údaj"),
-    date: z.coerce.date().min(new Date("2025-01-01"), "Dátum je povinný údaj"),
-    locations: z.array(baseCompetitionLocationSchema)
+    league_id: z.number(),
+    league_name: z.string(),
+    round: z.number(),
+    date: z.date(),
+    locations: z.array(baseLocationSchema),
 });
-// Edit CompetitionLocation schema and types
-export const editCompetitionLocationSchema = baseCompetitionLocationSchema.partial();
-export type EditCompetitionLocation = z.infer<typeof editCompetitionLocationSchema>;
-// Edit Competition schema and types
-export const editCompetitionSchema = baseCompetitionSchema.partial();
-export type EditCompetition = z.infer<typeof editCompetitionSchema>;
-// Competition Locations default type and schema with default values
-export const defaultCompetitionLocationSchema = z.object({
+
+export type Competition = z.infer<typeof baseCompetitionSchema>;
+/* ------------------------ Default values schemas ------------------------ */
+
+export const defaultLocationSchema = baseLocationSchema.partial().extend({
     id: z.number().default(0),
     group: z.string().default(""),
     city: z.string().default(""),
     club_id: z.number().default(0),
-    club_name: z.string().default("")
+    club_name: z.string().default(""),
 });
-export type DefaultCompetitionlocation = z.input<typeof defaultCompetitionLocationSchema>;
-//Competition default type and schema with default values
-export const defaultCompetitionSchema = z.object({
+
+export const defaultCompetitionSchema = baseCompetitionSchema.partial().extend({
     id: z.number().default(0),
     league_id: z.number().default(0),
+    league_name: z.string().default(""),
     round: z.number().default(1),
-    date: z.coerce.date().min(new Date()),
-    locations: z.array(defaultCompetitionLocationSchema)
+    date: z.date().default(new Date()),
+    locations: z.array(defaultLocationSchema).default([
+        defaultLocationSchema.parse({}),
+    ]),
 });
+
 export type DefaultCompetition = z.input<typeof defaultCompetitionSchema>;
 
-export interface CompetitionLocation {
-    id: number;
-    group: string;
-    city: string;
-    club_id: number;
-    club_name: string;
-}    
-export interface Competition {
-    id: number;
-    league: string;
-    round: number;
-    date: string;
-    locations: CompetitionLocation[];
-}
+/* ------------------------ Creation schemas ------------------------ */
+
+export const createLocationSchema = baseLocationSchema.omit({
+    id: true,
+    club_name: true,
+}).extend({
+    city: z.string().optional().default(""),
+});
+
+export const createCompetitionSchema = baseCompetitionSchema.omit({
+    id: true,
+    league_name: true,
+}).extend({
+    locations: z.array(createLocationSchema),
+}); 
+
+export type CreateCompetition = z.infer<typeof createCompetitionSchema>;
+
+/* ------------------------ Edit schemas ------------------------ */
+export const editLocationSchema = createLocationSchema.partial();
+export const editCompetitionSchema = createCompetitionSchema.partial().extend({
+    id: z.number(),
+    locations: z.array(editLocationSchema).optional(), // voliteľné pole lokácií
+});
+export type EditCompetition = z.infer<typeof editCompetitionSchema>;
 
 export interface Leagues {
     id: number;

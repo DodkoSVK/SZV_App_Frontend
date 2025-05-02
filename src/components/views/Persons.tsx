@@ -157,12 +157,12 @@ const ThePersons: React.FC = () => {
     };
     // Close form UI, -> Reload persons -> Close FormUI -> Turn OFF selecting -> Reset selecting ID and persons -> Deselect table row(s)
     const handleCloseFormUI = () => {
-       fetchPersons();
-       setFormUI(false);
-       setSelecting(false);
-       setSelectedIds([]);
-       setEditingPerson([]);
-       tableRef.current?.resetRowSelection();
+        fetchPersons();
+        setFormUI(false);
+        setSelecting(false);
+        setSelectedIds([]);
+        setEditingPerson([]);
+        tableRef.current?.resetRowSelection();
     };
     // Find person by ID in fetched persons and stored in component useState
     const searchPersonByID = (ids: number[]) => {

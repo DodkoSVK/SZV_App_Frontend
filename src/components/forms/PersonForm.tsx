@@ -12,7 +12,7 @@ import ComboBox from "./ComboBox";
 // Utils
 import { cn } from "@/lib/utils"
 import { format, parse } from "date-fns";
-import { da, sk } from "date-fns/locale";
+import { sk } from "date-fns/locale";
 // ShadUi Components
 import {
     Form,
@@ -20,7 +20,6 @@ import {
     FormField,
     FormItem,
     FormLabel,
-    FormMessage,
 } from "@/components/ui/form";
 import {
     Card,
@@ -40,7 +39,7 @@ import {
     Popover,
     PopoverContent,
     PopoverTrigger,
-  } from "@/components/ui/popover";
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button"
@@ -142,13 +141,13 @@ const PersonForm: React.FC<Props> = (props) => {
     // Resetting form after change data in selectedData, clubData and form
     useEffect(() => {
         if (personData && personData[selectedData]) {
-          const selected = personData[selectedData];
-          if (selected.birth && typeof selected.birth === "string") {
+            const selected = personData[selectedData];
+            if (selected.birth && typeof selected.birth === "string") {
             selected.birth = parse(selected.birth, "dd.MM.yyyy", new Date());
-          }      
-          form.reset(selected);
+            }      
+            form.reset(selected);
         }
-      }, [selectedData, personData, form]);
+    }, [selectedData, personData, form]);
 
     // save coming club data to component useState
     useEffect(() => {        
@@ -157,7 +156,9 @@ const PersonForm: React.FC<Props> = (props) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-filter backdrop-blur-xs">
             <Card className="w-full max-w-md">
-                <CardHeader>{formTitle}</CardHeader>
+                <CardHeader>
+                    <CardTitle>{formTitle}</CardTitle>
+                </CardHeader>
                 <CardContent>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -212,7 +213,7 @@ const PersonForm: React.FC<Props> = (props) => {
                                                                 { locale: sk }
                                                             )
                                                             ) : (
-                                                            <span>Pick a date</span>
+                                                            <span>Vyber dátum</span>
                                                         )}
                                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>

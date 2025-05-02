@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "start:frontend": "vite",
     "start:backend": "cd ../SZV_App_Backend && yarn dev",
-    "both": "concurrently \"yarn start:frontend\" \"yarn start:backend\""
+    "start-tunnel": "ssh -f -N -L 5433:localhost:5432 root@116.203.159.90",
+    "both": "yarn start-tunnel && concurrently \"yarn start-backend\" \"yarn start-frontend\""
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",

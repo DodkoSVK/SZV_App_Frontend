@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getLeagues = async () => {
     console.log("🟡 Získavam všetky ligy");
-    return axios.get('http://localhost:3002/api/league').then(response => {
+    return axios.get('https://app.vzpieranie.sk:3002/api/league').then(response => {
         const code = response.status;
         if (code >= 200 && code < 300) {
             if(Array.isArray(response.data)) return (response.data);            

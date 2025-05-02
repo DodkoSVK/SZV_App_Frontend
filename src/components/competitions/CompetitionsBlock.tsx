@@ -11,13 +11,15 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 interface Props {
-    competitions: Competition[]
-    selectingCompetitions: (selected: number[]) => void 
+    competitions: Competition[];
+    selectingCompetitions: (selected: number[]) => void;
+    clearSelectCompetitions: boolean;
 }
 
 const CompetitionsBlock: React.FC<Props> = (props) => {
-    const { competitions, selectingCompetitions } = props;
-
+    // Props
+    const { competitions, selectingCompetitions, clearSelectCompetitions } = props;
+    // UseStates
     const [localCompetitions, setLocalCompetitions] = useState<Competition[]>([])
     const [selectedCompetitions, setSelectedCompetitions] = useState<Set<number>>(new Set());
 
@@ -27,7 +29,6 @@ const CompetitionsBlock: React.FC<Props> = (props) => {
         3: "border-yellow-500",
         4: "border-red-500",
     };
-    
     
     // Function to handle check competitions
     const toggleCompetition = (id: number, checked: boolean) => {
@@ -42,11 +43,26 @@ const CompetitionsBlock: React.FC<Props> = (props) => {
         });
     };
     
+    useEffect(() => {
+        if (clearSelectCompetitions) {
+            setSelectedCompetitions(new Set());
+            selectingCompetitions([]); // pošleme späť prázdny výber
+        }
     
+        // Po 1 "tiku" vrátime späť false
+        const timeout = setTimeout(() => {
+            // notifikujeme rodiča, že bol reset spravený
+            // najlepší spôsob je cez callback, ale ak nie je, urobíme to cez prop
+            // (nižšie ti ukážem ako)
+        }, 100);
+    
+        return () => clearTimeout(timeout);
+    }, [clearSelectCompetitions]);
     // Send selected competitions ID(s) to competition component after render complete
     useEffect(() => {
         selectingCompetitions(Array.from(selectedCompetitions));
     }, [selectedCompetitions]);
+
     // Load competitions to local useState
     useEffect(() => {
         setLocalCompetitions(competitions); 
@@ -59,10 +75,10 @@ const CompetitionsBlock: React.FC<Props> = (props) => {
                         <CardHeader className="flex flex-row justify-start items-center gap-4 text-2xl">
                             <Checkbox
                                 checked = {selectedCompetitions.has(competition.id)}
-                                onCheckedChange={(checked) => toggleCompetition(competition.id, checked)}
+                                onCheckedChange={(checked) => toggleCompetition(competition.id, checked === true)}
                             />
                             <CardTitle>
-                                {`${competition.round}. Kolo, ${competition.league}, ${competition.date}`}
+                                {`${competition.round}. Kolo, ${competition.league_name}, ${competition.date}`}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>

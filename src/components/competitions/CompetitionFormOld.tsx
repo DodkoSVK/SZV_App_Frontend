@@ -21,7 +21,7 @@ interface Props {
     onDeleteCompetition: (competitionId: number) => void;
 }
 
-const CompetitionForm: React.FC<Props> = (props) => {
+const CompetitionFormOld: React.FC<Props> = (props) => {
     const { formTitle, competitionData, onClose, onCreateCompetition, onEditCompetition, onDeleteCompetition } = props;
 
     const [competition, setCompetition] = useState<Competition>(competitionData);    
@@ -262,6 +262,6 @@ const CompetitionForm: React.FC<Props> = (props) => {
         </section>
     );
 };
-export default CompetitionForm;
+export default CompetitionFormOld;
 
 

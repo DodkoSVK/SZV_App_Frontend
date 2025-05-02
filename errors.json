@@ -19,6 +19,13 @@
             "Failed select Row(s) in Persons": 2006,
             "Failed open Form UI in Persons": 2007,
             "Failed find person(s) by ID in fetched person in component useState": 2008
+        },
+        "competition_errors" : {
+            "Failed to fetch Competitions from DB in Frontend": 3001,
+            "Failed to create a new Competition to DB in Frontend": 3002,
+            "Failed to Edit a Competition to DB in Frontend": 3003,
+            "Failed open Form UI in Competitions": 3007,
+            "Failed find competition(s) by ID in fetched competition in component useState": 3008
         }
     }
 }
