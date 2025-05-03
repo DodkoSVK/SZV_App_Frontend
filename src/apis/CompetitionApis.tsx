@@ -3,7 +3,7 @@ import { CreateCompetition, EditCompetition } from "../assets/types/competitionT
 
 export const getCompetitions = async () => {
     console.log("🟡 Získavam všetky súťaže");
-    return axios.get('http://localhost:3002/api/competition').then(response => {
+    return axios.get('https://app.vzpieranie.sk:3002/api/competition').then(response => {
         const code = response.status;
         if (code >= 200 && code < 300) {
             if(Array.isArray(response.data)) return (response.data);            
@@ -21,7 +21,7 @@ export const getCompetitions = async () => {
 
 export const createCompetition = async (competition: CreateCompetition) => {
     console.log("🟡 Vytváram súťaž s týmito údajmi: ", competition);
-    return axios.post('http://localhost:3002/api/competition', competition).then(response => {            
+    return axios.post('https://app.vzpieranie.sk:3002/api/competition', competition).then(response => {            
         const code = response.status;            
         if (code >= 200 && code < 300) return 1;                
     }).catch(error => {
@@ -34,7 +34,7 @@ export const createCompetition = async (competition: CreateCompetition) => {
 
 export const editCompetition = async (competition: EditCompetition) => {
     console.log(`🟡 Upravujem osobu s týmito údajmi: ${JSON.stringify(competition)}`);
-    return axios.patch(`http://localhost:3002/api/competition/${competition.id}`, competition)    
+    return axios.patch(`https://app.vzpieranie.sk:3002/api/competitioncd/${competition.id}`, competition)    
     .then(res => {
         const code = res.status;
         if (code >= 200 && code < 300) return 1;          
