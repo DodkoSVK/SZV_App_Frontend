@@ -13,7 +13,10 @@ export const baseCompetitionSchema = z.object({
     id: z.number(),
     league_id: z.number(),
     league_name: z.string(),
-    round: z.number(),
+    round: z.preprocess(
+        (val) => typeof val === "string" || typeof val === "number" ? Number(val) : val,
+        z.number().int().min(1, { message: "Kolo musí byť kladné číslo" })
+    ),      
     date: z.date(),
     locations: z.array(baseLocationSchema),
 });

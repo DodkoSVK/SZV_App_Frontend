@@ -263,7 +263,7 @@ const CompetitionForm: React.FC<Props> = (props) => {
                                     <FormItem>
                                         <FormLabel>Kolo</FormLabel>
                                         <FormControl>
-                                            <Input {...field} />
+                                            <Input  type="number" {...field} />
                                         </FormControl>
                                     </FormItem>
                                 )}
