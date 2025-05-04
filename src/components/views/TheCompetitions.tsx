@@ -146,13 +146,6 @@ const TheCompetitions: React.FC = () => {
             setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
         }
     }    
-
-    useEffect(() => {        
-        console.log(`🟢 Upravujem súťaž: ${JSON.stringify(selectedIds)}`);
-    }, [selectedIds])
-    useEffect(() => {
-        console.log(`Sutaze: ${JSON.stringify(competitions)}`);
-    }, [competitions]);
     useEffect(() => {
         fetchCompetitions();
     }, []);
