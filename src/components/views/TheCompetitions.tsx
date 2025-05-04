@@ -157,13 +157,15 @@ const TheCompetitions: React.FC = () => {
                 <div className="flex flex-row gap-2">
                     { selecting && (
                         <>
-                            <Button
+                            <Button                                
+                                data-cy="del-comp"
                                 variant="red"
                                 onClick={() => console.log("Mazem sutaz")}
                             >
                                 Vymazať
                             </Button>
                             <Button
+                                data-cy="edit-comp"
                                 variant="orange"
                                 onClick={() => handleOpenFormUI()}
                             >
@@ -172,6 +174,7 @@ const TheCompetitions: React.FC = () => {
                         </>
                     )}
                     <Button
+                        data-cy="create-comp"
                         variant="green"
                         onClick={() => handleOpenFormUI()}
                     >

@@ -25,7 +25,7 @@ const TheNavigation: React.FC = () => {
                         <NavigationMenuItem>
                             
                             <NavigationMenuLink asChild>
-                                <NavLink to="/">
+                                <NavLink to="/" data-cy="nav-home">
                                     Domov
                                 </NavLink>
                             </NavigationMenuLink>
@@ -33,7 +33,7 @@ const TheNavigation: React.FC = () => {
 
                         <NavigationMenuItem>
                             <NavigationMenuLink asChild>
-                                <NavLink to="/clubs">
+                                <NavLink to="/clubs" data-cy="nav-clubs">
                                     Kluby
                                 </NavLink>
                             </NavigationMenuLink>
@@ -41,7 +41,7 @@ const TheNavigation: React.FC = () => {
 
                         <NavigationMenuItem>
                             <NavigationMenuLink asChild>
-                                <NavLink to="/persons">                                   
+                                <NavLink to="/persons" data-cy="nav-persons">                                   
                                     Ľudia
                                 </NavLink>
                             </NavigationMenuLink>
@@ -49,7 +49,7 @@ const TheNavigation: React.FC = () => {
 
                         <NavigationMenuItem>
                             <NavigationMenuLink asChild>
-                                <NavLink to="/competitions">
+                                <NavLink to="/competitions" data-cy="nav-competitions">
                                     Súťaže
                                 </NavLink>
                             </NavigationMenuLink>
