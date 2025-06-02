@@ -6,6 +6,7 @@ import TheClubs from './components/views/TheClubs';
 import ThePersons from './components/views/ThePersons';
 import TheCompetitions from './components/views/TheCompetitions';
 import Home from './components/views/TheHome';
+import TheLogin from './components/views/TheLogin';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/clubs" element={<TheClubs />} />
           <Route path="/persons" element={<ThePersons />} />
           <Route path="/competitions" element={<TheCompetitions />} />
+          <Route path="/login" element={<TheLogin />} />
         </Routes>
       </main>
     </div>

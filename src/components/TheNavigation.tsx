@@ -61,9 +61,11 @@ const TheNavigation: React.FC = () => {
 
 
                 <div className="flex items-center gap-4">
-                    <button className="rounded-md border border-input px-3 py-1.5 text-sm font-medium transition-colors hover:bg-primary hover:text-accent-foreground">
-                        Prihlásiť
-                    </button>
+                    <NavLink to="/login">
+                        <button className="rounded-md border border-input px-3 py-1.5 text-sm font-medium transition-colors hover:bg-primary hover:text-accent-foreground">
+                            Prihlásiť
+                        </button>
+                    </NavLink>                    
                     <ThemeToggle />
                 </div>
             </div>            
