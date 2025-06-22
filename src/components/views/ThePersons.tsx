@@ -219,7 +219,6 @@ const ThePersons: React.FC = () => {
                     tableRef={tableRef}
                     columnFilterName="fname"
                 />
-
             </div>            
             { formUI && (
                 <PersonForm 

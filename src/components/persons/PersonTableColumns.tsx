@@ -47,11 +47,25 @@ const PersonTableColumns: ColumnDef<Person>[] = [
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc") }
                 >
-                    Meno
+                    Priezvisko
                     <ArrowUpIcon className="ml-2 h-4 w-4" />
                 </Button>    
             )
         },
+    },
+    {
+        accessorKey: "login",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Prihlasovacie meno 
+                    <ArrowUpIcon className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        }
     },
     {
         accessorKey: "birth",
@@ -61,12 +75,12 @@ const PersonTableColumns: ColumnDef<Person>[] = [
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc") }
                 >
-                    Meno
+                    Dátum narodenia
                     <ArrowUpIcon className="ml-2 h-4 w-4" />
                 </Button>    
             )
         },
-    },
+    },    
     {
         accessorKey: "club",
         header: ({ column }) => {
@@ -75,7 +89,7 @@ const PersonTableColumns: ColumnDef<Person>[] = [
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc") }
                 >
-                    Meno
+                    Klub
                     <ArrowUpIcon className="ml-2 h-4 w-4" />
                 </Button>    
             )

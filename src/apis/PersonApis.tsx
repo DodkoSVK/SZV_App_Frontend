@@ -1,9 +1,11 @@
 import axios from "axios";
 import { CreatePerson, EditPerson } from "../assets/types/personTypes";
 
+// https://app.vzpieranie.sk:3002/api/person
+// http://localhost:3002/api/person
 export const getPersons = async () => {
     console.log(`🟡 Načítavam všetky osoby`);
-    return axios.get('https://app.vzpieranie.sk:3002/api/person').then(res => {        
+    return axios.get('http://localhost:3002/api/person').then(res => {        
         const code = res.status;        
         if(code >= 200 && code < 300) 
             if(Array.isArray(res.data)) return (res.data);            

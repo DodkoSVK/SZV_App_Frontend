@@ -5,6 +5,7 @@ export const basePersonSchema = z.object({
     fname: z.string().min(1, "Meno je povinný údaj"),
     sname: z.string().min(1, "Priezvisko je povinný údaj"),
     birth: z.coerce.date().min(new Date("1900-01-01"), "Dátum je povinný údaj"),
+    login: z.string().min(9, "Login musí mať minimálne 8 znakov").optional(),
     club_id: z.union([z.number().min(1, "Vyberte iný klub"), z.literal(0)]).optional(),
     club_name: z.string()
 })
@@ -20,6 +21,7 @@ export const defaultPersonSchcema = z.object({
     fname: z.string().default(""),
     sname: z.string().default(""),
     birth: z.coerce.date().default(new Date()),
+    login: z.string().default("firs.surn"),
     club_id: z.number().default(0),
     club_name: z.string().default("")
 });
@@ -30,6 +32,7 @@ export interface Person {
     fname: string
     sname: string
     birth: Date
+    login: string
     club_id: number
     club_name: string
 }
