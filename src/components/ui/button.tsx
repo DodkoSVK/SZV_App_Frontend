@@ -25,7 +25,9 @@ const buttonVariants = cva(
         orange:
           "bg-chart-4 text-white hover:bg-chart-4/50 hover:text-black dark:bg-chart-3 dark:hover:bg-chart-3/50 hover:text-white cursor-pointer",
         red:
-          "bg-chart-1 text-white hover:bg-chart-1/50 hover:text-black dark:bg-chart-5 dark:hover:bg-chart-5/50 hover:text-white cursor-pointer"
+          "bg-chart-1 text-white hover:bg-chart-1/50 hover:text-black dark:bg-chart-5 dark:hover:bg-chart-5/50 hover:text-white cursor-pointer",
+        violet:
+          "bg-chart-6 text-white hover:bg-chart-6/50 hover:text-black dark:bg-chart-4 dark:hover:bg-chart-4/50 hover:text-white cursor-pointer",
 
       },
       size: {

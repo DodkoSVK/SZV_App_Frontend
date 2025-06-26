@@ -54,20 +54,6 @@ const PersonTableColumns: ColumnDef<Person>[] = [
         },
     },
     {
-        accessorKey: "login",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Prihlasovacie meno 
-                    <ArrowUpIcon className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        }
-    },
-    {
         accessorKey: "birth",
         header: ({ column }) => {
             return (
@@ -81,6 +67,53 @@ const PersonTableColumns: ColumnDef<Person>[] = [
             )
         },
     },    
+    {
+        accessorKey: "login",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Prihlasovacie meno 
+                    <ArrowUpIcon className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const login = row.getValue("login") as string | null;
+            return <span>{login || "Bez loginu"}</span>;
+        }
+        
+    },
+    {
+        accessorKey: "email",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc") }
+                >
+                    E-Mail
+                    <ArrowUpIcon className="ml-2 h-4 w-4" />
+                </Button>    
+            )
+        },
+    },
+    {
+        accessorKey: "phone",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc") }
+                >
+                    Tel. Kontakt
+                    <ArrowUpIcon className="ml-2 h-4 w-4" />
+                </Button>    
+            )
+        },
+    },     
     {
         accessorKey: "club",
         header: ({ column }) => {

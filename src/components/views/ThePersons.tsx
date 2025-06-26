@@ -1,5 +1,5 @@
 // React, Methods
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { getPersons, createPerson, editPerson, deletePerson} from "@/apis/PersonApis";
 //Types
 import { Person, CreatePerson, EditPerson } from "@/assets/types/personTypes";
@@ -13,6 +13,7 @@ import PersonForm from "@/components/forms/PersonForm";
 // ShadUi Components
 import { Button } from "@/components/ui/button";
 import { Table } from "@tanstack/react-table";
+import { number } from "zod";
 
 //Component
 const ThePersons: React.FC = () => {
@@ -155,6 +156,22 @@ const ThePersons: React.FC = () => {
             setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
         }
     };
+    const handleCreateLogin = (personIds: number[]) => {
+        for (const id of personIds) {
+            console.log(`Creating login for person with id: ${id}`)
+        }
+    }
+    // Find all selected person/people by ID 
+    const selectedPersons = useMemo(() => {
+        return persons.filter(p => selectedIds.includes(p.id));
+    }, [selectedIds, persons]);
+    // Check if all person/people does not have a login
+    const showCreateLoginButton = useMemo(() => {
+        return (
+            selectedPersons.length > 0 &&
+            selectedPersons.every(p => !p.login || p.login.trim() === "")
+        );
+    }, [selectedPersons]);    
     // Close form UI, -> Reload persons -> Close FormUI -> Turn OFF selecting -> Reset selecting ID and persons -> Deselect table row(s)
     const handleCloseFormUI = () => {
         fetchPersons();
@@ -187,8 +204,16 @@ const ThePersons: React.FC = () => {
             <div className="flex flex-row justify-between mt-4 text-3xl mx-20 font-bold text-left text-[oklch(var(--foreground))] uppercase">
                 <h1>Športovci SZV</h1>
                 <div className="flex flex-row gap-2">   
+                    {selecting && showCreateLoginButton && (
+                        <Button
+                            variant="violet"
+                            onClick={() => handleCreateLogin(selectedIds)}
+                        >
+                            Vytvoriť login
+                        </Button>
+                        )}
                     { selecting && (
-                        <>
+                        <>     
                             <Button 
                                 variant="red"
                                 onClick={() => removePerson()}
@@ -200,7 +225,7 @@ const ThePersons: React.FC = () => {
                                 onClick={() => handleOpenFormUI()}
                             >
                                 Upraviť
-                            </Button>
+                            </Button>                            
                         </>                                                
                     )}            
                     <Button 
