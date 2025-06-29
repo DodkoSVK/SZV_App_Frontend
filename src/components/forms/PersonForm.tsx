@@ -86,26 +86,32 @@ const PersonForm: React.FC<Props> = (props) => {
     }
     // Handler after submit a form -> Create / Edit
     const onSubmit = async (data: DefaultPerson) => {
+        console.log("Submit spustený", data);
+
         if ( data.id === 0 ) {
             console.log(`Vytvaram osobu: ${data}`);
             const createPersonData: CreatePerson = {
                 fname: data.fname || "",
                 sname: data.sname || "",
                 birth: data.birth || new Date("1900-01-01"),
-                club_id: data.club_id || 0
+                club_id: data.club_id || 0,
+                email: data.email || "",
+                phone: data.phone || ""
             }
-            await onCreate?.(createPersonData);
+            onCreate?.(createPersonData);
             handleCloseUI();
         } else {
-            console.log(`Upravujem klub: ${data}`);
+            console.log(`Upravujem osobu: ${data}`);
             const editPersonData: EditPerson = {
                 id: data.id || localPersonData[selectedData].id,
                 fname: data.fname || localPersonData[selectedData].fname,
                 sname: data.sname || localPersonData[selectedData].sname,
                 birth: data.birth || localPersonData[selectedData].birth,
-                club_id: data.club_id || localPersonData[selectedData].club_id
+                club_id: data.club_id || localPersonData[selectedData].club_id,
+                email: data.email || localPersonData[selectedData].email,
+                phone: data.phone || localPersonData[selectedData].phone
             }
-            await onEdit(editPersonData);
+            onEdit(editPersonData);
             const updatedPersonData = [...localPersonData];
             updatedPersonData.splice(selectedData, 1);
             setLocalPersonData(updatedPersonData);
@@ -122,7 +128,7 @@ const PersonForm: React.FC<Props> = (props) => {
     // Handler after click exit button
     const handleCancelButton = useCallback((e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();        
-        console.log("Ruším vytvorenie klubu");
+        console.log("Ruším vytvorenie osoby");
         handleCloseUI();
     }, [handleCloseUI]);
     // Add event listener to esc keyboard
@@ -141,13 +147,17 @@ const PersonForm: React.FC<Props> = (props) => {
     // Resetting form after change data in selectedData, clubData and form
     useEffect(() => {
         if (personData && personData[selectedData]) {
-            const selected = personData[selectedData];
-            if (selected.birth && typeof selected.birth === "string") {
-            selected.birth = parse(selected.birth, "dd.MM.yyyy", new Date());
-            }      
-            form.reset(selected);
+            // neurobíme mutáciu, len resetneme:
+            form.reset(personData[selectedData]);
         }
     }, [selectedData, personData, form]);
+
+    /// TEST
+    useEffect(() => {
+        console.log("Validation errors:", form.formState.errors);
+      }, [form.formState.errors]);
+      
+    /// TEST
 
     // save coming club data to component useState
     useEffect(() => {        
@@ -159,7 +169,7 @@ const PersonForm: React.FC<Props> = (props) => {
                 <CardHeader>
                     <CardTitle>{formTitle}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent>                    
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField
@@ -189,49 +199,80 @@ const PersonForm: React.FC<Props> = (props) => {
                             />
 
                             <FormField
+                            control={form.control}
+                            name="birth"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                <FormLabel>Dátum narodenia</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                    <FormControl>
+                                        <Button
+                                        variant={"outline"}
+                                        className={cn(
+                                            "w-[240px] pl-3 text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                        )}
+                                        >
+                                        {field.value ? (
+                                            format(
+                                            typeof field.value === "string"
+                                                ? new Date(field.value)
+                                                : field.value,
+                                            "d. M. yyyy",
+                                            { locale: sk }
+                                            )
+                                        ) : (
+                                            <span>Vyber dátum</span>
+                                        )}
+                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                    </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                        mode="single"
+                                        selected={
+                                        typeof field.value === "string"
+                                            ? new Date(field.value)
+                                            : field.value
+                                        }
+                                        onSelect={field.onChange}
+                                        disabled={(date) => date < new Date("1900-01-01")}
+                                        initialFocus
+                                    />
+                                    </PopoverContent>
+                                </Popover>
+                                </FormItem>
+                            )}
+                            />
+
+
+                            <FormField 
                                 control={form.control}
-                                name="birth"
+                                name="email"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-col">
-                                        <FormLabel>Dátum narodenia</FormLabel>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <FormControl>
-                                                    <Button
-                                                        variant={"outline"}
-                                                        className={cn(
-                                                            "w-[240px] pl-3 text-left font-normal",
-                                                            !field.value && "text-muted-foreground"
-                                                        )}
-                                                    >
-                                                        {field.value ? (
-                                                            format(
-                                                                typeof field.value === "string"
-                                                                ? parse(field.value, "dd.MM.yyyy", new Date())
-                                                                : field.value,
-                                                                "d. M. yyyy",
-                                                                { locale: sk }
-                                                            )
-                                                            ) : (
-                                                            <span>Vyber dátum</span>
-                                                        )}
-                                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                    </Button>
-                                                </FormControl>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0" align="start">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={field.value}
-                                                    onSelect={field.onChange}
-                                                    disabled={(date) => date < new Date("1900-01-01")}
-                                                    initialFocus
-                                                />
-                                                </PopoverContent>
-                                        </Popover>
+                                    <FormItem>
+                                        <FormLabel>E-Mail</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
                                     </FormItem>
                                 )}
-                            />
+                            />   
+
+                            <FormField 
+                                control={form.control}
+                                name="phone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Mobilné číslo</FormLabel>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />                                    
 
                             <FormField
                                 control={form.control}

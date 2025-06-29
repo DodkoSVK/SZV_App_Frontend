@@ -53,7 +53,7 @@ export const getSortedPersons = async (key: string) => {
 };
 export const createPerson = async (person: CreatePerson) => {
     console.log("🟡 Vytváram osobu s týmito údajmi: ", person);
-    return axios.post('https://app.vzpieranie.sk:3002/api/person', person)
+    return axios.post('http://localhost:3002/api/person', person)
     .then(async res => {
         const code = res.status;
         if (code >= 200 && code < 300) return 1; 
@@ -66,7 +66,7 @@ export const createPerson = async (person: CreatePerson) => {
 }
 export const editPerson = async (person: EditPerson) => {
     console.log(`🟡 Upravujem osobu s týmito údajmi: ${JSON.stringify(person)}`);
-    return axios.patch(`https://app.vzpieranie.sk:3002/api/person/${person.id}`, person)    
+    return axios.patch(`http://localhost:3002/api/person/${person.id}`, person)    
     .then(res => {
         const code = res.status;
         if (code >= 200 && code < 300) return 1;          
@@ -79,7 +79,7 @@ export const editPerson = async (person: EditPerson) => {
 }
 export const deletePerson = async (id: number) => {
     console.log(`🟡 Mažem osobu s ID: ${id}`);
-    return axios.delete(`https://app.vzpieranie.sk:3002/api/person/${id}`)   
+    return axios.delete(`http://localhost:3002/api/person/${id}`)   
     .then(res => {
         const code = res.status;
         console.log(`Code: ${code}`);

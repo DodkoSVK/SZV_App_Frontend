@@ -13,7 +13,6 @@ import PersonForm from "@/components/forms/PersonForm";
 // ShadUi Components
 import { Button } from "@/components/ui/button";
 import { Table } from "@tanstack/react-table";
-import { number } from "zod";
 
 //Component
 const ThePersons: React.FC = () => {
