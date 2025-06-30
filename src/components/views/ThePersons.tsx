@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { getPersons, createPerson, editPerson, deletePerson} from "@/apis/PersonApis";
 //Types
-import { Person, CreatePerson, EditPerson } from "@/assets/types/personTypes";
+import { Person, CreatePerson, EditPerson, RegisterPerson } from "@/assets/types/personTypes";
 import { Alert } from "@/assets/types/index";
 //Children Components
 import SuccessAlert from "@/components/alerts/SuccessAlert";
@@ -13,6 +13,7 @@ import PersonForm from "@/components/forms/PersonForm";
 // ShadUi Components
 import { Button } from "@/components/ui/button";
 import { Table } from "@tanstack/react-table";
+import { registerPerson } from "@/apis/AuthApis";
 
 //Component
 const ThePersons: React.FC = () => {
@@ -155,9 +156,40 @@ const ThePersons: React.FC = () => {
             setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
         }
     };
-    const handleCreateLogin = (personIds: number[]) => {
-        for (const id of personIds) {
-            console.log(`Creating login for person with id: ${id}`)
+    const handleCreateLogin = async (personIds: number[]) => {
+        searchPersonByID(personIds);
+        for (const person of editingPerson) {   
+            const sendingData: RegisterPerson = {
+                id: person.id,
+                fname: person.fname,
+                sname: person.sname,
+                email: person.email
+            }         
+            try {                
+                const registerStatus = await registerPerson(sendingData)
+                if(registerStatus === 1 ) {
+                    setAlert({
+                        alertType: true,
+                        alertMessage: `Login pre osobu ${person.fname}, ${person.sname} vytvoreny.`
+                    });
+                    await fetchPersons();
+                } else if (registerStatus === 2 ) {
+                    setAlert({
+                        alertType: false,
+                        alertMessage: "Nesprávna požiadavka"
+                    });
+                } else if (registerStatus === 3) {
+                    setAlert({
+                        alertType: false,
+                        alertMessage: "Chyba pri spracovaní požiadavky"
+                    });
+                }     
+            } catch (e) {
+                const error = 2009;
+                console.log(`🔴 Chyba: ${error}. ${e}`);
+                setAlert({ alertType: false, alertMessage: `Chyba: ${error}`});
+            }
+            
         }
     }
     // Find all selected person/people by ID 

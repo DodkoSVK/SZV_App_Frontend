@@ -18,7 +18,8 @@
             "Failed to close alert in Persons": 2005,
             "Failed select Row(s) in Persons": 2006,
             "Failed open Form UI in Persons": 2007,
-            "Failed find person(s) by ID in fetched person in component useState": 2008
+            "Failed find person(s) by ID in fetched person in component useState": 2008,
+            "Failed create a login for person": 2009
         },
         "competition_errors" : {
             "Failed to fetch Competitions from DB in Frontend": 3001,

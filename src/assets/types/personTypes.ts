@@ -40,6 +40,11 @@ export interface Person {
     club_id: number
     club_name: string
 }
-
+export interface RegisterPerson {
+    id: number,
+    fname: string,
+    sname: string,
+    email: string
+}
 
 
