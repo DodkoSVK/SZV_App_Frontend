@@ -27,6 +27,9 @@
             "Failed to Edit a Competition to DB in Frontend": 3003,
             "Failed open Form UI in Competitions": 3007,
             "Failed find competition(s) by ID in fetched competition in component useState": 3008
+        },
+        "auth_errors" : {
+            "Failed login": 4001
         }
     }
 }

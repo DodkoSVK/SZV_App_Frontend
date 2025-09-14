@@ -21,6 +21,7 @@ export const loginPerson = async (credentials: loginCredentials) => {
     return axios.post('http://localhost:3002/api/auth/login', credentials)
     .then(async res => {
         const code = res.status;
+        console.log(`Response: ${JSON.stringify(res.data)}`);
         if (code >= 200 && code < 300) return 1; 
     }).catch(e => {
         const code = e.status;            
