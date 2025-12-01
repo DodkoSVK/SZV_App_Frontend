@@ -43,6 +43,7 @@
             <Button class="rounded-md border border-input px-3 py-1.5 text-sm font-medium transition-colors hover:bg-primary hover:text-accent-foreground">
                 Prihlásiť
             </Button>
+            <TheThemeToggle></TheThemeToggle>
         </div>
     </div>
 </template>
@@ -56,6 +57,10 @@
         NavigationMenuList
     } from './ui/navigation-menu';
     import { Button } from './ui/button';
+    import TheThemeToggle from './TheThemeToggle.vue';
+
+    
+    
 </script>
 
 <style scoped>
