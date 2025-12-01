@@ -2,12 +2,7 @@
   <Button
     variant="outline"
     size="icon"
-    @click="toggleTheme"
-    class="
-      transition-transform hover:scale-110 relative
-      hover:bg-primary hover:text-accent
-      dark:hover:bg-primary dark:hover:text-white
-    "
+    @click="toggleTheme"   
     aria-label="Prepni tému"
   >
     <!-- Sun icon (svetlá téma) -->

@@ -40,7 +40,10 @@
         </NavigationMenu>
 
         <div class="flex items-center gap-4">
-            <Button class="rounded-md border border-input px-3 py-1.5 text-sm font-medium transition-colors hover:bg-primary hover:text-accent-foreground">
+            <Button
+                variant="outline"
+                
+            >
                 Prihlásiť
             </Button>
             <TheThemeToggle></TheThemeToggle>
